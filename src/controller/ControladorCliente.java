@@ -57,6 +57,14 @@ public class ControladorCliente {
 	
 	
 	
+	@FXML
+	public void initialize() {
+		this.cliente.setTextArea(mensajes_textArea);
+		nombre_Text.setText(cliente.getNombre());
+	}
+	
+	
+    
 	public void setCliente(Cliente c) {
 		this.cliente = c;
 	}
@@ -67,6 +75,8 @@ public class ControladorCliente {
 	
 	
 	
+	
+	
     @FXML
     private Button enviar_button;
 
@@ -74,7 +84,7 @@ public class ControladorCliente {
     private HBox info_Hbox;
 
     @FXML
-    private Text info_Text;
+    private Text info_text;
 
     @FXML
     private HBox input_HBox;
@@ -96,12 +106,22 @@ public class ControladorCliente {
     
     
     
+//    public Text getNombreText() {
+//    	return nombre_text;
+//    }
+    
+    
     @FXML
-	public void initialize() {
-    	this.nombre_Text.setText(cliente.getNombre());
-    	
-    	this.cliente.setTextArea(mensajes_textArea);
-	}
+    void cerrarChat(MouseEvent event) {
+    	try {
+			cliente.getSocket().close();
+			System.exit(0);
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
+    }
+    
     
     
     @FXML

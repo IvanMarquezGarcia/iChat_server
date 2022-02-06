@@ -89,7 +89,7 @@ public class Servidor {
                 
                 // Indicar en el area de texto que el servidor se ha iniciado
                 Platform.runLater(()
-                        -> textArea.appendText("[" + new Date() + "] - Nuevo servidor iniciado\n"));
+                        -> textArea.appendText("[" + new Date() + "] | [HOST: " + serverSocket.getInetAddress().getHostAddress() + " PORT: " + serverSocket.getLocalPort() + "] - Nuevo servidor iniciado\n"));
 
                 while (true) {
                 	// Escuchar peticiones de conexion

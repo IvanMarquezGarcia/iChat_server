@@ -33,8 +33,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
-import controller.ControladorCliente;
+import controller.ControladorDatosCliente;
 
 import model.Cliente;
 
@@ -44,19 +45,21 @@ public class AplicacionCliente extends Application {
     
     @Override
     public void start(Stage stage) {
-    	Cliente c = new Cliente("Iván", "localhost", 1234);
-    	ControladorCliente ccli = new ControladorCliente(c);
+    	Cliente cliente = new Cliente();
+    	ControladorDatosCliente cdc = new ControladorDatosCliente(cliente);
     	
-    	URL rutaRecurso = getClass().getResource("/view/VistaCliente.fxml");
-    	FXMLLoader fxmlLoader = new FXMLLoader(rutaRecurso);
+    	URL rutaVistaDatosCliente = getClass().getResource("/view/VistaDatosCliente.fxml");
+    	FXMLLoader vistaDatosClienteLoader = new FXMLLoader(rutaVistaDatosCliente);
     	
-    	fxmlLoader.setController(ccli);
+    	vistaDatosClienteLoader.setController(cdc);
     	
-		try {
-			Scene scene = new Scene(fxmlLoader.load(), 530, 600);
+    	try {
+			Scene scene = new Scene(vistaDatosClienteLoader.load(), 420, 280);
 			
-			stage.setTitle("Cliente de eiChat - " + c.getNombre());
+			stage.setTitle("Log in | eiChat");
 			stage.setScene(scene);
+			stage.setResizable(false);
+			stage.initStyle(StageStyle.UNDECORATED);
 	    	stage.show();
 		} catch (IOException e) {
 			e.printStackTrace();

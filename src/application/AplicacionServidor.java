@@ -54,10 +54,11 @@ public class AplicacionServidor extends Application {
     	fxmlLoader.setController(cs);
     	
 		try {
-			Scene scene = new Scene(fxmlLoader.load(), 530, 600);
+			Scene scene = new Scene(fxmlLoader.load(), 785, 600);
 			
 			stage.setTitle("Servidor de eiChat");
 			stage.setScene(scene);
+			stage.setResizable(false);
 	    	stage.show();
 		} catch (IOException e) {
 			e.printStackTrace();

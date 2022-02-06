@@ -5,6 +5,8 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
@@ -12,25 +14,34 @@
 
 <VBox fx:id="root_VBox" alignment="TOP_CENTER" maxHeight="600.0" maxWidth="530.0" minHeight="600.0" minWidth="530.0" prefHeight="600.0" prefWidth="530.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <HBox fx:id="info_Hbox" alignment="TOP_CENTER" prefWidth="605.0" VBox.vgrow="ALWAYS">
+      <HBox fx:id="info_Hbox" alignment="CENTER" prefWidth="605.0" VBox.vgrow="ALWAYS">
          <children>
-            <Text fx:id="info_Text" strokeType="OUTSIDE" strokeWidth="0.0" text="Conectado como " textAlignment="CENTER">
-               <font>
-                  <Font name="Consolas" size="13.0" />
-               </font>
+            <HBox alignment="CENTER" prefHeight="33.0" prefWidth="495.0">
+               <children>
+                  <Text fx:id="info_Text" strokeType="OUTSIDE" strokeWidth="0.0" text="Conectado como " textAlignment="CENTER">
+                     <font>
+                        <Font name="Consolas" size="13.0" />
+                     </font>
+                  </Text>
+                  <Text fx:id="nombre_Text" strokeType="OUTSIDE" strokeWidth="0.0" text="anónimo" textAlignment="CENTER">
+                     <font>
+                        <Font name="Consolas" size="13.0" />
+                     </font>
+                  </Text>
+               </children>
+            </HBox>
+            <ImageView fx:id="cerrar_ImageView" fitHeight="33.0" fitWidth="20.0" onMouseClicked="#cerrarChat" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../res/images/close.png" />
+               </image>
                <HBox.margin>
-                  <Insets bottom="10.0" top="10.0" />
+                  <Insets />
                </HBox.margin>
-            </Text>
-            <Text fx:id="nombre_Text" strokeType="OUTSIDE" strokeWidth="0.0" text="anónimo" textAlignment="CENTER">
-               <font>
-                  <Font name="Consolas" size="13.0" />
-               </font>
-               <HBox.margin>
-                  <Insets bottom="10.0" top="10.0" />
-               </HBox.margin>
-            </Text>
+            </ImageView>
          </children>
+         <VBox.margin>
+            <Insets />
+         </VBox.margin>
       </HBox>
       <ScrollPane fx:id="mensajes_scrollPane" VBox.vgrow="ALWAYS">
          <content>

@@ -36,25 +36,61 @@ import javafx.scene.control.TextArea;
 
 public class Cliente {
 
-	private final String NOMBRE;
+	private String nombre;
 	private DataOutputStream output;
 	private Socket socket;
 	public TextArea textArea;
 
 	// host y puerto del servidor
-	private String hostServidor;
-	private int portServidor;
+//	private String hostServidor;
+//	private int portServidor;
 
 
 
+	public Cliente() {
+		// this("Anónimo", "localhost", 1234);
+	}
+	
 	public Cliente(String nombre, String host, int port) {
-		this.NOMBRE = nombre;
-		this.hostServidor = host;
-		this.portServidor = port;
+		this.nombre = nombre;
+//		this.hostServidor = host;
+//		this.portServidor = port;
+	}
+
+
+
+	public void setTextArea(TextArea textArea) {
+		this.textArea = textArea;
+	}
+	
+	public void setNombre(String n) {
+		this.nombre = n;
+	}
+	
+	public String getNombre() {
+		return nombre;
+	}
+	
+	public void setSocket(Socket s) {
+		this.socket = s;
+	}
+	
+	public Socket getSocket() {
+		return socket;
+	}
+
+	public DataOutputStream getOutput() {
+		return output;
+	}
+	
+	
+	
+	public void conectar() {
+		// hacer check
 		
 		try {
 			// Crear un socket para conector con el servidor
-			socket = new Socket(hostServidor, portServidor);
+			//socket = new Socket(hostServidor, portServidor);
 
 			// Crear un flujo de salida
 			output = new DataOutputStream(socket.getOutputStream());
@@ -67,22 +103,9 @@ public class Cliente {
 		} catch (IOException ex) {
 			// En caso de excepción, indicarlo y mostrarla por consola
 			ex.printStackTrace();
-			System.out.println(ex.toString());
+			System.out.println("--------------------------------------------------------");
+			System.out.println("Error al conectar");
 		}
-	}
-
-
-
-	public void setTextArea(TextArea textArea) {
-		this.textArea = textArea;
-	}
-	
-	public String getNombre() {
-		return NOMBRE;
-	}
-
-	public DataOutputStream getOutput() {
-		return output;
 	}
 
 }

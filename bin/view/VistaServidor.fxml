@@ -23,7 +23,7 @@
       </Text>
       <ScrollPane fx:id="mensajes_scrollPane" VBox.vgrow="ALWAYS">
          <content>
-            <TextArea fx:id="mensajes_textArea" editable="false" minHeight="-Infinity" minWidth="-Infinity" prefHeight="487.0" prefWidth="770.0" promptText="Los mensajes de los clientes podrán verse aquí" wrapText="true">
+            <TextArea fx:id="mensajes_textArea" editable="false" minHeight="-Infinity" minWidth="-Infinity" prefHeight="479.0" prefWidth="770.0" promptText="Los mensajes de los clientes podrán verse aquí" wrapText="true">
                <font>
                   <Font name="Consolas Bold" size="15.0" />
                </font>
