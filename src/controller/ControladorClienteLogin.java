@@ -29,17 +29,17 @@ import model.Cliente;
 
 
 
-public class ControladorDatosCliente {
+public class ControladorClienteLogin {
 
 	private Cliente cliente;
 	
 	
 	
-	public ControladorDatosCliente() {
+	public ControladorClienteLogin() {
 		this(null);
 	}
 	
-	public ControladorDatosCliente(Cliente c) {
+	public ControladorClienteLogin(Cliente c) {
 		this.cliente = c;
 	}
 	
@@ -110,10 +110,10 @@ public class ControladorDatosCliente {
 		        
 		        
 		        // Abrir ventana de chat
-		        URL rutaVistaCliente = getClass().getResource("/view/VistaCliente.fxml");
+		        URL rutaVistaCliente = getClass().getResource("/view/VistaClienteChat.fxml");
 		    	FXMLLoader vistaClienteLoader = new FXMLLoader(rutaVistaCliente);
 		    	
-		    	ControladorCliente cc = new ControladorCliente(cliente);
+		    	ControladorClienteChat cc = new ControladorClienteChat(cliente);
 		    	
 		    	vistaClienteLoader.setController(cc);
 		    	

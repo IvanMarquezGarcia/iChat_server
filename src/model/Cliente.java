@@ -31,14 +31,17 @@ import java.io.IOException;
 import java.net.Socket;
 
 import javafx.scene.control.TextArea;
+import javafx.scene.text.Text;
 
 
 
 public class Cliente {
 
 	private String nombre;
-	private DataOutputStream output;
+	private byte estado;	// -1 = error; 0 = desconectado; 1 = conectado;
 	private Socket socket;
+	private DataOutputStream output;
+	public Text errorText;
 	public TextArea textArea;
 
 	// host y puerto del servidor
@@ -53,12 +56,21 @@ public class Cliente {
 	
 	public Cliente(String nombre, String host, int port) {
 		this.nombre = nombre;
+		this.estado = -1;
 //		this.hostServidor = host;
 //		this.portServidor = port;
 	}
 
 
 
+	public byte getEstado() {
+		return estado;
+	}
+	
+	public void setErrorText(Text t) {
+		this.errorText = t;
+	}
+	
 	public void setTextArea(TextArea textArea) {
 		this.textArea = textArea;
 	}
@@ -85,26 +97,59 @@ public class Cliente {
 	
 	
 	
-	public void conectar() {
-		// hacer check
-		
+	public void desconectar() {
 		try {
-			// Crear un socket para conector con el servidor
-			//socket = new Socket(hostServidor, portServidor);
-
-			// Crear un flujo de salida
-			output = new DataOutputStream(socket.getOutputStream());
-
-			// Crear un HiloLector para leer mensajes del servidor constantemente
-			HiloLector task = new HiloLector(socket, this);
-
-			Thread thread = new Thread(task);
-			thread.start();
-		} catch (IOException ex) {
-			// En caso de excepción, indicarlo y mostrarla por consola
-			ex.printStackTrace();
-			System.out.println("--------------------------------------------------------");
-			System.out.println("Error al conectar");
+    		// Indicar desconexión al servidor
+    		output.writeUTF("|/\\\\/\\//\\|");
+    		
+    		// Desconectar
+	    	socket.shutdownInput();
+	    	socket.shutdownOutput();
+	    	socket.close();
+	    	socket = null;
+	    	
+	    	estado = 0;
+    	}
+    	catch(IOException ioe) {
+    		estado = -1;
+    		
+    		ioe.printStackTrace();
+    		
+    		System.out.println("-----------------------------------------------------------");
+    		System.out.println("Error al desconectar el cliente");
+    		
+    		System.exit(1);
+    	}
+	}
+	
+	public void conectar() {
+		// implementar check
+		
+		
+		
+		if (estado == 0) {
+			try {
+				// Crear un socket para conector con el servidor
+				//socket = new Socket(hostServidor, portServidor);
+	
+				// Crear un flujo de salida
+				output = new DataOutputStream(socket.getOutputStream());
+	
+				// Crear un HiloLector para leer mensajes del servidor constantemente
+				HiloLector task = new HiloLector(socket, this);
+	
+				Thread thread = new Thread(task);
+				thread.start();
+				
+				estado = 1;
+			} catch (IOException ex) {
+				estado = -1;
+				
+				// En caso de excepción, indicarlo y mostrarla por consola
+				ex.printStackTrace();
+				System.out.println("--------------------------------------------------------");
+				System.out.println("Error al conectar");
+			}
 		}
 	}
 

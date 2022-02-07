@@ -33,7 +33,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 
 import javafx.stage.Stage;
-
+import javafx.stage.StageStyle;
 import controller.ControladorServidor;
 
 import model.Servidor;
@@ -54,11 +54,12 @@ public class AplicacionServidor extends Application {
     	fxmlLoader.setController(cs);
     	
 		try {
-			Scene scene = new Scene(fxmlLoader.load(), 785, 600);
+			Scene scene = new Scene(fxmlLoader.load(), 785, 895);
 			
 			stage.setTitle("Servidor de eiChat");
 			stage.setScene(scene);
 			stage.setResizable(false);
+			stage.initStyle(StageStyle.UNDECORATED);
 	    	stage.show();
 		} catch (IOException e) {
 			e.printStackTrace();

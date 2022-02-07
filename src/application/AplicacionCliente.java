@@ -35,7 +35,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-import controller.ControladorDatosCliente;
+import controller.ControladorClienteLogin;
 
 import model.Cliente;
 
@@ -46,9 +46,9 @@ public class AplicacionCliente extends Application {
     @Override
     public void start(Stage stage) {
     	Cliente cliente = new Cliente();
-    	ControladorDatosCliente cdc = new ControladorDatosCliente(cliente);
+    	ControladorClienteLogin cdc = new ControladorClienteLogin(cliente);
     	
-    	URL rutaVistaDatosCliente = getClass().getResource("/view/VistaDatosCliente.fxml");
+    	URL rutaVistaDatosCliente = getClass().getResource("/view/VistaClienteLogin.fxml");
     	FXMLLoader vistaDatosClienteLoader = new FXMLLoader(rutaVistaDatosCliente);
     	
     	vistaDatosClienteLoader.setController(cdc);

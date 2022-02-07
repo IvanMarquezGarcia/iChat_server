@@ -22,6 +22,8 @@ package controller;
 
 
 import java.io.IOException;
+import java.net.Socket;
+import java.net.SocketException;
 
 import javafx.fxml.FXML;
 
@@ -29,7 +31,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 
 import javafx.scene.layout.HBox;
@@ -41,17 +43,17 @@ import model.Cliente;
 
 
 
-public class ControladorCliente {
+public class ControladorClienteChat {
 
 	private Cliente cliente;
 	
 	
 	
-	public ControladorCliente() {
+	public ControladorClienteChat() {
 		this(null);
 	}
 	
-	public ControladorCliente(Cliente c) {
+	public ControladorClienteChat(Cliente c) {
 		this.cliente = c;
 	}
 	
@@ -61,6 +63,7 @@ public class ControladorCliente {
 	public void initialize() {
 		this.cliente.setTextArea(mensajes_textArea);
 		nombre_Text.setText(cliente.getNombre());
+		cliente.errorText = error_text;
 	}
 	
 	
@@ -76,6 +79,12 @@ public class ControladorCliente {
 	
 	
 	
+	 
+	@FXML
+	private ImageView desconectar_ImageView;
+
+    @FXML
+    private Text error_text;
 	
     @FXML
     private Button enviar_button;
@@ -113,35 +122,60 @@ public class ControladorCliente {
     
     @FXML
     void cerrarChat(MouseEvent event) {
-    	try {
-			cliente.getSocket().close();
-			System.exit(0);
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
+    	if (cliente.getEstado() == 1) {
+			cliente.desconectar();
+			
+			if (cliente.getEstado() == 0)
+				System.exit(0);
+			else
+				System.exit(1);
+    	}
+    	else {
+    		try {
+    			Socket s = cliente.getSocket();
+    			
+    			if (s != null) {
+    				if (s.isClosed() == false)
+	    				s.close();
+    				
+    				s = null;
+    			}
+    			
+				System.exit(0);
+			} catch (IOException e) {
+				e.printStackTrace();
+				System.exit(1);
+			}
+    	}
     }
     
+    
+    @FXML
+    void desconectarChat(MouseEvent event) {
+    	cliente.desconectar();
+    }
     
     
     @FXML
     void enviar_buttonFXClicked(MouseEvent event) {
-    	try {
-            String message = input_textField.getText().trim();
-
-            // Si el mensaje o username no son especificados
-            // no se envía nada al servidor
-            if (message.length() > 0) {
-                // Enviar mensaje al servidor
-                cliente.getOutput().writeUTF("[" + cliente.getNombre() + "]: " + message + "");
-                
-                cliente.getOutput().flush(); // Limpiar flujo de salida
-
-                input_textField.clear(); // Limpiar cuadro de escritura
-            }
-        } catch (IOException ex) {
-            System.err.println(ex);
-        }
+    	if (cliente.getEstado() == 1) {
+	    	try {
+	            String message = input_textField.getText().trim();
+	
+	            // Si el mensaje o username no son especificados
+	            // no se envía nada al servidor
+	            if (message.length() > 0) {
+	                // Enviar mensaje al servidor
+	                cliente.getOutput().writeUTF("[" + cliente.getNombre() + "]: " + message + "");
+	                
+	                cliente.getOutput().flush(); // Limpiar flujo de salida
+	
+	                input_textField.clear(); // Limpiar cuadro de escritura
+	            }
+	        } catch (IOException ex) {
+	            System.err.println(ex);
+	        }
+    	}
     }
 
 }
