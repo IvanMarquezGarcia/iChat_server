@@ -23,8 +23,8 @@ package controller;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.net.SocketException;
 
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 
 import javafx.scene.control.Button;
@@ -38,7 +38,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import javafx.scene.text.Text;
-
+import javafx.stage.Stage;
 import model.Cliente;
 
 
@@ -46,6 +46,9 @@ import model.Cliente;
 public class ControladorClienteChat {
 
 	private Cliente cliente;
+	
+	private double xOffset;
+	private double yOffset;
 	
 	
 	
@@ -64,6 +67,22 @@ public class ControladorClienteChat {
 		this.cliente.setTextArea(mensajes_textArea);
 		nombre_Text.setText(cliente.getNombre());
 		cliente.errorText = error_text;
+		
+		root.setOnMousePressed(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                xOffset = ((Stage) root.getScene().getWindow()).getX() - event.getScreenX();
+                yOffset = ((Stage) root.getScene().getWindow()).getY() - event.getScreenY();
+            }
+        });
+		
+		root.setOnMouseDragged(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+            	((Stage) root.getScene().getWindow()).setX(event.getScreenX() + xOffset);
+            	((Stage) root.getScene().getWindow()).setY(event.getScreenY() + yOffset);
+            }
+        });
 	}
 	
 	
@@ -111,14 +130,7 @@ public class ControladorClienteChat {
     private Text nombre_Text;
 
     @FXML
-    private VBox root_VBox;
-    
-    
-    
-//    public Text getNombreText() {
-//    	return nombre_text;
-//    }
-    
+    private VBox root;
     
     @FXML
     void cerrarChat(MouseEvent event) {
@@ -127,8 +139,13 @@ public class ControladorClienteChat {
 			
 			if (cliente.getEstado() == 0)
 				System.exit(0);
-			else
+			else {
+				System.out.println("---------------------------------------------------------------------");
+				System.out.println("Error al desconectar el cliente");
+				System.out.println("---------------------------------------------------------------------");
+				
 				System.exit(1);
+			}
     	}
     	else {
     		try {
@@ -143,7 +160,11 @@ public class ControladorClienteChat {
     			
 				System.exit(0);
 			} catch (IOException e) {
+				System.out.println("---------------------------------------------------------------------");
 				e.printStackTrace();
+				System.out.println("Error al desconectar el cliente");
+				System.out.println("---------------------------------------------------------------------");
+				
 				System.exit(1);
 			}
     	}
@@ -173,7 +194,14 @@ public class ControladorClienteChat {
 	                input_textField.clear(); // Limpiar cuadro de escritura
 	            }
 	        } catch (IOException ex) {
-	            System.err.println(ex);
+	        	String errorMsg = "Error al enviar";
+	        	System.out.println("---------------------------------------------------------------------");
+				ex.printStackTrace();
+				System.out.println(errorMsg);
+				System.out.println("---------------------------------------------------------------------");
+				
+				cliente.errorText.setText(errorMsg);
+				cliente.errorText.setVisible(true);
 	        }
     	}
     }

@@ -24,7 +24,6 @@ import java.io.DataInputStream;
 import java.io.IOException;
 
 import java.net.Socket;
-import java.net.SocketException;
 
 import javafx.application.Platform;
 
@@ -32,64 +31,66 @@ import javafx.application.Platform;
 
 public class HiloLector implements Runnable {
 	
-    Socket socket;
+    Socket socketCliente;
     Cliente cliente;
     DataInputStream input;
 
     
     
-    public HiloLector(Socket socket, Cliente cliente) {
-        this.socket = socket;
+    public HiloLector(Cliente cliente) {
         this.cliente = cliente;
+        this.socketCliente = cliente.getSocket();
     }
 
     
     
     @Override 
     public void run() {
-        while (true) {
+    	try {
+	        // Iniciar flujo de entrada
+	    	input = new DataInputStream(socketCliente.getInputStream());
+    	}
+    	catch (IOException ex) {
+    		String errorMsg = "Error al crear el socket del cliente"; 
+            
+    		if (socketCliente == null)
+        		errorMsg = "Flujo de entrada cerrado";
+        		
+        		System.out.println("-----------------------------------------------------------");
+        		ex.printStackTrace();
+        		System.out.println(errorMsg);
+        		System.out.println("-----------------------------------------------------------");
+        		
+        		
+        		cliente.errorText.setText(errorMsg);
+        		cliente.errorText.setVisible(true);
+        }
+    	
+        while (cliente.getEstado() == 1) {
+        	// Setear mensaje por defecto y ocultar errorText
+        	cliente.errorText.setVisible(false);
+        	cliente.errorText.setText("Error de conexión");
+
+            // recibir del servidor
+            String mensaje = null;
             try {
-                // Iniciar flujo de entrada
-                try {
-                	input = new DataInputStream(socket.getInputStream());
-                	
-                	cliente.errorText.setVisible(false);
-                	cliente.errorText.setText("Error de conexión");
-                } catch(SocketException se) {
-                	if (socket == null) {
-                		String errorMsg = "Flujo de salida cerrado";
-                		
-                		System.out.println(errorMsg);
-                		
-                		cliente.errorText.setText(errorMsg);
-                		cliente.errorText.setVisible(true);
-                	}
-                }
-
-                // recibir del cliente
-                String mensaje = null;
-                try {
-                	mensaje = input.readUTF();
-                } catch(SocketException se) {
-                	if (socket == null)
-                		System.out.println("Flujo de entrada cerrado.");
-                }
-
-                if (mensaje != null) {
-                	String msg = mensaje;
-	                // imprimirla en el área de texto
-	                Platform.runLater(() -> {
-	                    cliente.textArea.appendText(msg + "\n");
-	                });
-                }
+            	mensaje = input.readUTF();
+            } catch(IOException ioe) {
+            	System.out.println("-----------------------------------------------------------");
+            	ioe.printStackTrace();
+            	if (socketCliente.isClosed() == true || socketCliente.isInputShutdown() == true)
+            		System.out.println("Flujo de entrada cerrado.");
+            	System.out.println("-----------------------------------------------------------");
             }
-            catch (IOException ex) {
-            	// En caso de excepciones de e/s, imprimirlas por consola y detener la escucha
-            	ex.printStackTrace();
-                System.out.println("\nError en la comunicación con el servidor");
-                break;
+
+            if (mensaje != null) {
+                // imprimirla en el área de texto
+            	String msg = mensaje;
+                Platform.runLater(() -> {
+                	cliente.textArea.appendText(msg + "\n");
+                });
             }
         }
-    }
+        }
     
 }

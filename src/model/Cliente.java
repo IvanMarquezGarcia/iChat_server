@@ -113,10 +113,10 @@ public class Cliente {
     	catch(IOException ioe) {
     		estado = -1;
     		
-    		ioe.printStackTrace();
-    		
     		System.out.println("-----------------------------------------------------------");
+    		ioe.printStackTrace();
     		System.out.println("Error al desconectar el cliente");
+    		System.out.println("-----------------------------------------------------------");
     		
     		System.exit(1);
     	}
@@ -124,19 +124,21 @@ public class Cliente {
 	
 	public void conectar() {
 		// implementar check
-		
-		
+		// implementar check
+		// implementar check
+		// implementar check
+		// implementar check
+		// implementar check
+		// implementar check
+		// implementar check
 		
 		if (estado == 0) {
 			try {
-				// Crear un socket para conector con el servidor
-				//socket = new Socket(hostServidor, portServidor);
-	
 				// Crear un flujo de salida
 				output = new DataOutputStream(socket.getOutputStream());
 	
 				// Crear un HiloLector para leer mensajes del servidor constantemente
-				HiloLector task = new HiloLector(socket, this);
+				HiloLector task = new HiloLector(this);
 	
 				Thread thread = new Thread(task);
 				thread.start();
@@ -145,10 +147,10 @@ public class Cliente {
 			} catch (IOException ex) {
 				estado = -1;
 				
-				// En caso de excepción, indicarlo y mostrarla por consola
+				System.out.println("-----------------------------------------------------------");
 				ex.printStackTrace();
-				System.out.println("--------------------------------------------------------");
-				System.out.println("Error al conectar");
+				System.out.println("Error al conectar con el servidor");
+				System.out.println("-----------------------------------------------------------");
 			}
 		}
 	}

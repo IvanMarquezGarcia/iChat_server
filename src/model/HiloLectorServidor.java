@@ -34,13 +34,13 @@ import javafx.application.Platform;
 
 public class HiloLectorServidor implements Runnable {
 
-	Socket socket;
+	Socket socketCliente;
 	Servidor servidor;
 	DataInputStream input;
 	DataOutputStream output;
 
 	public HiloLectorServidor(Socket socket, Servidor server) {
-		this.socket = socket;
+		this.socketCliente = socket;
 		this.servidor = server;
 	}
 
@@ -48,8 +48,8 @@ public class HiloLectorServidor implements Runnable {
 	public void run() {
 		try {
 			// Iniciar flujos de entrada y salida
-			input = new DataInputStream(socket.getInputStream());
-			output = new DataOutputStream(socket.getOutputStream());
+			input = new DataInputStream(socketCliente.getInputStream());
+			output = new DataOutputStream(socketCliente.getOutputStream());
 
 			while (true) {
 				// Reciber mensaje de cliente
@@ -57,13 +57,13 @@ public class HiloLectorServidor implements Runnable {
 
 				// String para indicar la desconexión: |/\\\\/\\//\\|
 				if (mensaje.equals("|/\\\\/\\//\\|")) {
-					String host = socket.getInetAddress().getHostName();
-					int port = socket.getPort();
+					String host = socketCliente.getInetAddress().getHostName();
+					int port = socketCliente.getPort();
 					
-					socket.shutdownInput();
-					socket.shutdownOutput();
-					socket.close();
-					socket = null;
+					socketCliente.shutdownInput();
+					socketCliente.shutdownOutput();
+					socketCliente.close();
+					socketCliente = null;
 					
 					input.close();
 					input = null;
@@ -88,13 +88,23 @@ public class HiloLectorServidor implements Runnable {
 				}
 			}
 		}
-		catch (IOException ex) { ex.printStackTrace(); }
+		catch (IOException ex) {
+			System.out.println("-----------------------------------------------------------");
+			ex.printStackTrace();
+			System.out.println("Error de e/s");
+			System.out.println("-----------------------------------------------------------");
+		}
 		finally {
 			try {
-				if (socket != null && socket.isClosed() == false)
-					socket.close();
+				if (socketCliente != null && socketCliente.isClosed() == false)
+					socketCliente.close();
 			}
-			catch (IOException ex) { ex.printStackTrace(); }
+			catch (IOException ex) {
+				System.out.println("-----------------------------------------------------------");
+				ex.printStackTrace();
+				System.out.println("Error al cerrar el socket del cliente");
+				System.out.println("-----------------------------------------------------------");
+			}
 		}
 	}
 
@@ -107,7 +117,10 @@ public class HiloLectorServidor implements Runnable {
 			output.flush();
 
 		} catch (IOException ex) {
+			System.out.println("-----------------------------------------------------------");
 			ex.printStackTrace();
+			System.out.println("Error al enviar el mensaje al servidor");
+			System.out.println("-----------------------------------------------------------");
 		} 
 	}
 	

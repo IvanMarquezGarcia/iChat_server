@@ -84,7 +84,7 @@ public class Servidor {
 	// Enviar mensaje a todos los clientes
     public void mensajeParaTodos(String message) {
         for (HiloLectorServidor clientConnection : this.listaConexiones) {
-        	if (clientConnection.socket != null)
+        	if (clientConnection.socketCliente != null)
         		clientConnection.sendMessage(message);
         }
     }
@@ -97,16 +97,16 @@ public class Servidor {
 	    	try {
 	    		if (listaConexiones.size() > 0) {
 			    	for (HiloLectorServidor hls : listaConexiones) {
-			    		if (hls != null && hls.socket != null) {
-				    		if (hls.socket.isInputShutdown() == false)
-				    			hls.socket.shutdownInput();
+			    		if (hls != null && hls.socketCliente != null) {
+				    		if (hls.socketCliente.isInputShutdown() == false)
+				    			hls.socketCliente.shutdownInput();
 				    		
-				    		if (hls.socket.isOutputShutdown() == false)
-				    			hls.socket.shutdownOutput();
+				    		if (hls.socketCliente.isOutputShutdown() == false)
+				    			hls.socketCliente.shutdownOutput();
 				    		
-				    		if (hls.socket.isClosed() == false) {
-				    			hls.socket.close();
-				    			hls.socket = null;
+				    		if (hls.socketCliente.isClosed() == false) {
+				    			hls.socketCliente.close();
+				    			hls.socketCliente = null;
 				    		}
 			    		}
 			    	}
@@ -122,7 +122,10 @@ public class Servidor {
 	    			textArea.appendText("[" + new Date() + "] | [HOST: " + host + " PORT: " + port + "] - Servidor desconectado\n");
 	    		}
 			} catch (IOException e) {
+				System.out.println("-----------------------------------------------------------");
 				e.printStackTrace();
+				System.out.println("Error al desconectar el servidor");
+				System.out.println("-----------------------------------------------------------");
 			}
     	}
     }
@@ -151,7 +154,7 @@ public class Servidor {
                 		while(iteradorConexiones.hasNext()) {
                 			HiloLectorServidor hls = iteradorConexiones.next();
                 			
-                			if (hls.socket == null) {
+                			if (hls.socketCliente == null) {
             	    			iteradorConexiones.remove();
             	    			hls = null;
             	    		}
@@ -164,18 +167,22 @@ public class Servidor {
                 		System.out.println("número de conexiones despues de limpiar " + listaConexiones.size());
                 	}
                 	// Escuchar peticiones de conexión
-                	Socket socket = null;
+                	Socket socketNuevoCliente = null;
                 	try {
-                		socket = serverSocket.accept();
-                	} catch(SocketException se) {
+                		socketNuevoCliente = serverSocket.accept();
+                	}
+                	catch(IOException e) {
+                		System.out.println("-----------------------------------------------------------");
+                		e.printStackTrace();
                 		System.out.println("La escucha del servidor se ha interrumpido.");
+                		System.out.println("-----------------------------------------------------------");
                 	}
                     
-                	if (socket != null) {
-	                    textArea.appendText("[" + new Date() + "] | [HOST: " + socket.getInetAddress().getHostAddress() + " PORT: " + socket.getPort() + "] - Nuevo cliente conectado\n");
+                	if (socketNuevoCliente != null) {
+	                    textArea.appendText("[" + new Date() + "] | [HOST: " + socketNuevoCliente.getInetAddress().getHostAddress() + " PORT: " + socketNuevoCliente.getPort() + "] - Nuevo cliente conectado\n");
 	                    
 	                    // Añadir la nueva conexión a la lista de conexiones
-	                    HiloLectorServidor connection = new HiloLectorServidor(socket, this);
+	                    HiloLectorServidor connection = new HiloLectorServidor(socketNuevoCliente, this);
 	                    listaConexiones.add(connection);
 	
 	                    // Crear y ejecutar un nuevo hilo para la conexión
@@ -184,10 +191,10 @@ public class Servidor {
                 	}
                 }
             } catch (IOException ex) {
-            	// Si se da una excepción, imprimirla en el área de texto
-                textArea.appendText(ex.toString() + '\n');
-                
+            	System.out.println("-----------------------------------------------------------");
                 ex.printStackTrace();
+                System.out.println("Error al abrir el socket del servidor");
+                System.out.println("-----------------------------------------------------------");
             }
         }).start();
 	}
