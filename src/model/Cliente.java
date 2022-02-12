@@ -138,7 +138,7 @@ public class Cliente {
 				output = new DataOutputStream(socket.getOutputStream());
 	
 				// Crear un HiloLector para leer mensajes del servidor constantemente
-				HiloLector task = new HiloLector(this);
+				HiloLectorCliente task = new HiloLectorCliente(this);
 	
 				Thread thread = new Thread(task);
 				thread.start();

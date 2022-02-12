@@ -40,20 +40,26 @@ public class Servidor {
 	private ServerSocket serverSocket;
 	private boolean conectado;
 	private boolean limpiar;
+	private int numMaxConx;
     public TextArea textArea;
    
     // Lista de conexiones
-    private ArrayList<HiloLectorServidor> listaConexiones = new ArrayList<HiloLectorServidor>(0);
+    private ArrayList<HiloServidor> listaConexiones = new ArrayList<HiloServidor>(0);
 	
 	
 	
 	public Servidor(int port) {
-		this("localhost", port);
+		this("localhost", port, -1);
 	}
 	
-	public Servidor(String host, int port) {
+	public Servidor(int port, int max) {
+		this("localhost", port, max);
+	}
+	
+	public Servidor(String host, int port, int max) {
 		this.HOST = host;
 		this.PORT = port;
+		this.numMaxConx = max;
 		conectado = false;
 		limpiar = false;
 	}
@@ -75,7 +81,7 @@ public class Servidor {
 		this.limpiar = b;
 	}
 	
-	public ArrayList<HiloLectorServidor> getConexiones() {
+	public ArrayList<HiloServidor> getConexiones() {
 		return listaConexiones;
 	}
 	
@@ -83,7 +89,7 @@ public class Servidor {
 	
 	// Enviar mensaje a todos los clientes
     public void mensajeParaTodos(String message) {
-        for (HiloLectorServidor clientConnection : this.listaConexiones) {
+        for (HiloServidor clientConnection : this.listaConexiones) {
         	if (clientConnection.socketCliente != null)
         		clientConnection.sendMessage(message);
         }
@@ -96,7 +102,7 @@ public class Servidor {
     		
 	    	try {
 	    		if (listaConexiones.size() > 0) {
-			    	for (HiloLectorServidor hls : listaConexiones) {
+			    	for (HiloServidor hls : listaConexiones) {
 			    		if (hls != null && hls.socketCliente != null) {
 				    		if (hls.socketCliente.isInputShutdown() == false)
 				    			hls.socketCliente.shutdownInput();
@@ -149,10 +155,10 @@ public class Servidor {
                 		System.out.println("número de conexiones antes de limpiar " + listaConexiones.size());
                 		limpiar = false;
                 		
-                		Iterator<HiloLectorServidor> iteradorConexiones = listaConexiones.iterator();
+                		Iterator<HiloServidor> iteradorConexiones = listaConexiones.iterator();
                 		
                 		while(iteradorConexiones.hasNext()) {
-                			HiloLectorServidor hls = iteradorConexiones.next();
+                			HiloServidor hls = iteradorConexiones.next();
                 			
                 			if (hls.socketCliente == null) {
             	    			iteradorConexiones.remove();
@@ -166,28 +172,56 @@ public class Servidor {
             	    	System.out.println("------------------------------------------------------------");
                 		System.out.println("número de conexiones despues de limpiar " + listaConexiones.size());
                 	}
-                	// Escuchar peticiones de conexión
-                	Socket socketNuevoCliente = null;
-                	try {
-                		socketNuevoCliente = serverSocket.accept();
-                	}
-                	catch(IOException e) {
-                		System.out.println("-----------------------------------------------------------");
-                		e.printStackTrace();
-                		System.out.println("La escucha del servidor se ha interrumpido.");
-                		System.out.println("-----------------------------------------------------------");
-                	}
-                    
-                	if (socketNuevoCliente != null) {
-	                    textArea.appendText("[" + new Date() + "] | [HOST: " + socketNuevoCliente.getInetAddress().getHostAddress() + " PORT: " + socketNuevoCliente.getPort() + "] - Nuevo cliente conectado\n");
+                	
+                	if (numMaxConx != -1 && numMaxConx > listaConexiones.size()) {
+	                	// Escuchar peticiones de conexión
+	                	Socket socketNuevoCliente = null;
+	                	try {
+	                		socketNuevoCliente = serverSocket.accept();
+	                	}
+	                	catch(IOException e) {
+	                		System.out.println("-----------------------------------------------------------");
+	                		e.printStackTrace();
+	                		System.out.println("La escucha del servidor se ha interrumpido.");
+	                		System.out.println("-----------------------------------------------------------");
+	                	}
 	                    
-	                    // Añadir la nueva conexión a la lista de conexiones
-	                    HiloLectorServidor connection = new HiloLectorServidor(socketNuevoCliente, this);
-	                    listaConexiones.add(connection);
-	
-	                    // Crear y ejecutar un nuevo hilo para la conexión
-	                    Thread thread = new Thread(connection);
-	                    thread.start();
+	                	if (socketNuevoCliente != null) {
+		                    textArea.appendText("[" + new Date() + "] | [HOST: " + socketNuevoCliente.getInetAddress().getHostAddress() + " PORT: " + socketNuevoCliente.getPort() + "] - Nuevo cliente conectado\n");
+		                    
+		                    // Añadir la nueva conexión a la lista de conexiones
+		                    HiloServidor connection = new HiloServidor(socketNuevoCliente, this);
+		                    listaConexiones.add(connection);
+		
+		                    // Crear y ejecutar un nuevo hilo para la conexión
+		                    Thread thread = new Thread(connection);
+		                    thread.start();
+	                	}
+                	}
+                	else if (numMaxConx == -1) {
+	                	// Escuchar peticiones de conexión
+	                	Socket socketNuevoCliente = null;
+	                	try {
+	                		socketNuevoCliente = serverSocket.accept();
+	                	}
+	                	catch(IOException e) {
+	                		System.out.println("-----------------------------------------------------------");
+	                		e.printStackTrace();
+	                		System.out.println("La escucha del servidor se ha interrumpido.");
+	                		System.out.println("-----------------------------------------------------------");
+	                	}
+	                    
+	                	if (socketNuevoCliente != null) {
+		                    textArea.appendText("[" + new Date() + "] | [HOST: " + socketNuevoCliente.getInetAddress().getHostAddress() + " PORT: " + socketNuevoCliente.getPort() + "] - Nuevo cliente conectado\n");
+		                    
+		                    // Añadir la nueva conexión a la lista de conexiones
+		                    HiloServidor connection = new HiloServidor(socketNuevoCliente, this);
+		                    listaConexiones.add(connection);
+		
+		                    // Crear y ejecutar un nuevo hilo para la conexión
+		                    Thread thread = new Thread(connection);
+		                    thread.start();
+	                	}
                 	}
                 }
             } catch (IOException ex) {

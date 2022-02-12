@@ -32,14 +32,14 @@ import javafx.application.Platform;
 
 
 
-public class HiloLectorServidor implements Runnable {
+public class HiloServidor implements Runnable {
 
 	Socket socketCliente;
 	Servidor servidor;
 	DataInputStream input;
 	DataOutputStream output;
 
-	public HiloLectorServidor(Socket socket, Servidor server) {
+	public HiloServidor(Socket socket, Servidor server) {
 		this.socketCliente = socket;
 		this.servidor = server;
 	}

@@ -34,9 +34,8 @@ import javafx.scene.Scene;
 
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import controller.ControladorServidor;
 
-import model.Servidor;
+import controller.ControladorServidorConfig;
 
 
 
@@ -44,19 +43,17 @@ public class AplicacionServidor extends Application {
 
     @Override
     public void start(Stage stage) {
-    	URL rutaRecurso = getClass().getResource("/view/VistaServidor.fxml");
+    	URL rutaRecurso = getClass().getResource("/view/VistaServidorConfig.fxml");
     	FXMLLoader fxmlLoader = new FXMLLoader(rutaRecurso);
     	
-    	Servidor servidor = new Servidor(1234);
-    	
-    	ControladorServidor cs = new ControladorServidor(servidor);
+    	ControladorServidorConfig cs = new ControladorServidorConfig();
     	
     	fxmlLoader.setController(cs);
     	
 		try {
-			Scene scene = new Scene(fxmlLoader.load(), 785, 895);
+			Scene scene = new Scene(fxmlLoader.load(), 375, 280);
 			
-			stage.setTitle("Servidor de eiChat");
+			stage.setTitle("Configuración de Servidor de eiChat");
 			stage.setScene(scene);
 			stage.setResizable(false);
 			stage.initStyle(StageStyle.UNDECORATED);

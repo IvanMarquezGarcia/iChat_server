@@ -10,10 +10,10 @@
 
 
 
-	------------------------------- DESCRIPCIÓN ------------------------------- MEJORAR DESCRIPCIÓN
+	------------------------------- DESCRIPCIÓN -------------------------------
 
 	Controlador de la vista VistaServidor.fxml.
- */
+*/
 
 
 

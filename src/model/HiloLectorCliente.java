@@ -10,8 +10,10 @@
 	
 	
 	
-	------------------------------- DESCRIPCIÓN ------------------------------- MEJORAR DESCRIPCIÓN
-	Permite al cliente recibir información del servidor de forma continua.
+	------------------------------- DESCRIPCIÓN -------------------------------
+	
+	Permite al cliente recibir información del servidor de forma continua sin
+	limitar su capacidad de enviar información.
 */
 
 
@@ -24,12 +26,13 @@ import java.io.DataInputStream;
 import java.io.IOException;
 
 import java.net.Socket;
+import java.net.SocketException;
 
 import javafx.application.Platform;
 
 
 
-public class HiloLector implements Runnable {
+public class HiloLectorCliente implements Runnable {
 	
     Socket socketCliente;
     Cliente cliente;
@@ -37,7 +40,7 @@ public class HiloLector implements Runnable {
 
     
     
-    public HiloLector(Cliente cliente) {
+    public HiloLectorCliente(Cliente cliente) {
         this.cliente = cliente;
         this.socketCliente = cliente.getSocket();
     }
@@ -46,11 +49,14 @@ public class HiloLector implements Runnable {
     
     @Override 
     public void run() {
+    	boolean correcto = true;
+    	
     	try {
 	        // Iniciar flujo de entrada
 	    	input = new DataInputStream(socketCliente.getInputStream());
     	}
     	catch (IOException ex) {
+    		correcto = false;
     		String errorMsg = "Error al crear el socket del cliente"; 
             
     		if (socketCliente == null)
@@ -66,7 +72,7 @@ public class HiloLector implements Runnable {
         		cliente.errorText.setVisible(true);
         }
     	
-        while (cliente.getEstado() == 1) {
+        while (cliente.getEstado() == 1 && correcto == true) {
         	// Setear mensaje por defecto y ocultar errorText
         	cliente.errorText.setVisible(false);
         	cliente.errorText.setText("Error de conexión");
@@ -75,11 +81,22 @@ public class HiloLector implements Runnable {
             String mensaje = null;
             try {
             	mensaje = input.readUTF();
-            } catch(IOException ioe) {
+            }
+            catch(SocketException se) {
+            	correcto = false;
+            	
             	System.out.println("-----------------------------------------------------------");
-            	ioe.printStackTrace();
+            	se.printStackTrace();
             	if (socketCliente.isClosed() == true || socketCliente.isInputShutdown() == true)
             		System.out.println("Flujo de entrada cerrado.");
+            	System.out.println("-----------------------------------------------------------");
+            }
+            catch(IOException ioe) {
+            	correcto = false;
+            	
+            	System.out.println("-----------------------------------------------------------");
+            	ioe.printStackTrace();
+            	System.out.println("Error de e/s.");
             	System.out.println("-----------------------------------------------------------");
             }
 
