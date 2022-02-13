@@ -23,6 +23,7 @@ package model;
 
 
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 
 import java.net.Socket;
@@ -81,12 +82,21 @@ public class HiloLectorCliente implements Runnable {
             String mensaje = null;
             try {
             	mensaje = input.readUTF();
+            	
+            	if (mensaje.equals("|/\\\\/\\//\\|")) {
+            		cliente.errorText.setText("Servidor desconectado");
+            		cliente.errorText.setVisible(true);
+            		
+					cliente.desconectar();
+					
+					mensaje = null;
+            	}
             }
             catch(SocketException se) {
             	correcto = false;
             	
             	System.out.println("-----------------------------------------------------------");
-            	se.printStackTrace();
+            	//se.printStackTrace();
             	if (socketCliente.isClosed() == true || socketCliente.isInputShutdown() == true)
             		System.out.println("Flujo de entrada cerrado.");
             	System.out.println("-----------------------------------------------------------");

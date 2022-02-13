@@ -26,6 +26,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.Date;
 
 import javafx.application.Platform;
@@ -51,7 +52,7 @@ public class HiloServidor implements Runnable {
 			input = new DataInputStream(socketCliente.getInputStream());
 			output = new DataOutputStream(socketCliente.getOutputStream());
 
-			while (true) {
+			while (servidor.isConectado() == true) {
 				// Reciber mensaje de cliente
 				String mensaje = input.readUTF();
 
@@ -71,7 +72,7 @@ public class HiloServidor implements Runnable {
 					output.close();
 					output = null;
 					
-					servidor.textArea.appendText("[" + new Date() + "] | [HOST: " + host + " PORT: " + port + "] - Cliente desconectado\n");
+					servidor.textArea.appendText("[" + new Date() + "] | [HOST: " + host + " PORT: " + port + "] - " +  + " se ha desconectado\n");
 					
 					clienteDesconectado();
 					
@@ -88,9 +89,15 @@ public class HiloServidor implements Runnable {
 				}
 			}
 		}
-		catch (IOException ex) {
+		catch(SocketException se) {
+    		System.out.println("-----------------------------------------------------------");
+    		se.printStackTrace();
+    		System.out.println("La escucha del servidor se ha interrumpido.");
+    		System.out.println("-----------------------------------------------------------");
+    	}
+		catch (IOException ioe) {
 			System.out.println("-----------------------------------------------------------");
-			ex.printStackTrace();
+			ioe.printStackTrace();
 			System.out.println("Error de e/s");
 			System.out.println("-----------------------------------------------------------");
 		}

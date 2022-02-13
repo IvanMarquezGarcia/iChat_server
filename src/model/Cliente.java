@@ -29,6 +29,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import java.net.Socket;
+import java.net.SocketException;
 
 import javafx.scene.control.TextArea;
 import javafx.scene.text.Text;
@@ -54,9 +55,9 @@ public class Cliente {
 		// this("Anónimo", "localhost", 1234);
 	}
 	
-	public Cliente(String nombre, String host, int port) {
+	public Cliente(String nombre/*, String host, int port*/) {
 		this.nombre = nombre;
-		this.estado = -1;
+		this.estado = 0;
 //		this.hostServidor = host;
 //		this.portServidor = port;
 	}
@@ -103,12 +104,31 @@ public class Cliente {
     		output.writeUTF("|/\\\\/\\//\\|");
     		
     		// Desconectar
+    		if (socket.isInputShutdown() == false)
+    			socket.shutdownInput();
+    		
+    		if (socket.isOutputShutdown() == false)
+    			socket.shutdownOutput();
+    		
+    		if (socket.isClosed() == false) {
+    			socket.close();
+    			socket = null;
+    		}
+    		/*
 	    	socket.shutdownInput();
 	    	socket.shutdownOutput();
 	    	socket.close();
 	    	socket = null;
-	    	
+	    	*/
 	    	estado = 0;
+    	}
+		catch(SocketException se) {
+    		System.out.println("-----------------------------------------------------------");
+    		se.printStackTrace();
+    		System.out.println("La comunicación con el servidor se ha interrumpido.");
+    		System.out.println("-----------------------------------------------------------");
+    		
+    		estado = 0;
     	}
     	catch(IOException ioe) {
     		estado = -1;
@@ -117,8 +137,6 @@ public class Cliente {
     		ioe.printStackTrace();
     		System.out.println("Error al desconectar el cliente");
     		System.out.println("-----------------------------------------------------------");
-    		
-    		System.exit(1);
     	}
 	}
 	

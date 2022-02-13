@@ -46,8 +46,6 @@ public class ControladorClienteLogin {
 	public ControladorClienteLogin(Cliente c) {
 		this.cliente = c;
 	}
-	
-	
     
 	public void setCliente(Cliente c) {
 		this.cliente = c;
@@ -55,6 +53,14 @@ public class ControladorClienteLogin {
 	
 	public Cliente getCliente() {
 		return cliente;
+	}
+	/*
+	public void setNombreDatos(String nombre) {
+		nombreDatos_textField.setText(nombre);
+	}*/
+	
+	public void setNombreDatos() {
+		nombreDatos_textField.setText(cliente.getNombre());
 	}
 	
 	
@@ -119,7 +125,7 @@ public class ControladorClienteLogin {
 					try {
 						Scene scene = new Scene(vistaClienteLoader.load(), 530, 600);
 						
-						// Cerrar ventana de datos
+						// Cerrar ventana de login
 				    	Node source = (Node) event.getSource();
 				        Stage stage = (Stage) source.getScene().getWindow();
 				        stage.close();

@@ -23,10 +23,13 @@ package controller;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.net.URL;
 
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
@@ -39,6 +42,7 @@ import javafx.scene.layout.VBox;
 
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import model.Cliente;
 
 
@@ -174,6 +178,37 @@ public class ControladorClienteChat {
     @FXML
     void desconectarChat(MouseEvent event) {
     	cliente.desconectar();
+    	
+    	ControladorClienteLogin cdc = new ControladorClienteLogin(cliente);
+    	
+    	URL rutaVistaDatosCliente = getClass().getResource("/view/VistaClienteLogin.fxml");
+    	FXMLLoader vistaDatosClienteLoader = new FXMLLoader(rutaVistaDatosCliente);
+    	
+    	vistaDatosClienteLoader.setController(cdc);
+    	
+    	try {
+			Scene scene = new Scene(vistaDatosClienteLoader.load(), 420, 280);
+			
+			// Cerrar ventana de chat
+	    	Node source = (Node) event.getSource();
+	        Stage stage = (Stage) source.getScene().getWindow();
+	        stage.close();
+			
+	        // Abrir ventana de login
+			stage.setTitle("Log in | eiChat");
+			stage.setScene(scene);
+			stage.setResizable(false);
+			
+			cdc.initialize();
+	    	cdc.setNombreDatos();
+			
+	    	stage.show();
+		} catch (IOException e) {
+			System.out.println("---------------------------------------------------------------------");
+			e.printStackTrace();
+			System.out.println("Error al cargar la ventana");
+			System.out.println("---------------------------------------------------------------------");
+		}
     }
     
     

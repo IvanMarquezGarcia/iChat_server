@@ -73,6 +73,10 @@ public class Servidor {
 		return PORT;
 	}
 	
+	public boolean isConectado() {
+		return conectado;
+	}
+	
 	public void setTextArea(TextArea txt) {
 		this.textArea = txt;
 	}
@@ -99,10 +103,17 @@ public class Servidor {
     public void desconectar() {
     	if (conectado == true) {
     		conectado = false;
+
+    		limpiarConexiones();
+    		mensajeParaTodos("|/\\\\/\\//\\|");
     		
 	    	try {
 	    		if (listaConexiones.size() > 0) {
-			    	for (HiloServidor hls : listaConexiones) {
+	    			Iterator hlsIterator = listaConexiones.iterator();
+	    			
+			    	while (hlsIterator.hasNext() == true) {
+			    		HiloServidor hls = (HiloServidor) hlsIterator.next();
+			    		
 			    		if (hls != null && hls.socketCliente != null) {
 				    		if (hls.socketCliente.isInputShutdown() == false)
 				    			hls.socketCliente.shutdownInput();
@@ -114,6 +125,8 @@ public class Servidor {
 				    			hls.socketCliente.close();
 				    			hls.socketCliente = null;
 				    		}
+				    		
+				    		hlsIterator.remove();
 			    		}
 			    	}
 	    		}
@@ -135,6 +148,29 @@ public class Servidor {
 			}
     	}
     }
+    
+    private void limpiarConexiones() {
+    	System.out.println("------------------------------------------------------------");
+		System.out.println("número de conexiones antes de limpiar " + listaConexiones.size());
+		limpiar = false;
+		
+		Iterator<HiloServidor> iteradorConexiones = listaConexiones.iterator();
+		
+		while(iteradorConexiones.hasNext()) {
+			HiloServidor hls = iteradorConexiones.next();
+			
+			if (hls.socketCliente == null) {
+    			iteradorConexiones.remove();
+    			hls = null;
+    		}
+		}
+    	
+    	listaConexiones.trimToSize();
+    	System.gc();
+    	
+    	System.out.println("------------------------------------------------------------");
+		System.out.println("número de conexiones despues de limpiar " + listaConexiones.size());
+    }
 	
 	public void arrancar() {
 		conectado = true;
@@ -150,28 +186,8 @@ public class Servidor {
                         -> textArea.appendText("[" + new Date() + "] | [HOST: " + serverSocket.getInetAddress().getHostAddress() + " PORT: " + serverSocket.getLocalPort() + "] - Servidor iniciado\n"));
 
                 while (conectado == true) {
-                	if (limpiar == true) {
-                		System.out.println("------------------------------------------------------------");
-                		System.out.println("número de conexiones antes de limpiar " + listaConexiones.size());
-                		limpiar = false;
-                		
-                		Iterator<HiloServidor> iteradorConexiones = listaConexiones.iterator();
-                		
-                		while(iteradorConexiones.hasNext()) {
-                			HiloServidor hls = iteradorConexiones.next();
-                			
-                			if (hls.socketCliente == null) {
-            	    			iteradorConexiones.remove();
-            	    			hls = null;
-            	    		}
-                		}
-            	    	
-            	    	listaConexiones.trimToSize();
-            	    	System.gc();
-            	    	
-            	    	System.out.println("------------------------------------------------------------");
-                		System.out.println("número de conexiones despues de limpiar " + listaConexiones.size());
-                	}
+                	if (limpiar == true)
+                		limpiarConexiones();
                 	
                 	if (numMaxConx != -1 && numMaxConx > listaConexiones.size()) {
 	                	// Escuchar peticiones de conexión
@@ -204,10 +220,16 @@ public class Servidor {
 	                	try {
 	                		socketNuevoCliente = serverSocket.accept();
 	                	}
-	                	catch(IOException e) {
+	                	catch(SocketException se) {
 	                		System.out.println("-----------------------------------------------------------");
-	                		e.printStackTrace();
+	                		se.printStackTrace();
 	                		System.out.println("La escucha del servidor se ha interrumpido.");
+	                		System.out.println("-----------------------------------------------------------");
+	                	}
+	                	catch(IOException ioe) {
+	                		System.out.println("-----------------------------------------------------------");
+	                		ioe.printStackTrace();
+	                		System.out.println("Error de e/s.");
 	                		System.out.println("-----------------------------------------------------------");
 	                	}
 	                    
