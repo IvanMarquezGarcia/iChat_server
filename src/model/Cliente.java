@@ -25,6 +25,7 @@ package model;
 
 
 
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
@@ -32,6 +33,7 @@ import java.net.Socket;
 import java.net.SocketException;
 
 import javafx.scene.control.TextArea;
+
 import javafx.scene.text.Text;
 
 
@@ -74,6 +76,10 @@ public class Cliente {
 	
 	public void setTextArea(TextArea textArea) {
 		this.textArea = textArea;
+	}
+	
+	public void setError_text(Text t) {
+		this.errorText = t;
 	}
 	
 	public void setNombre(String n) {
@@ -140,7 +146,7 @@ public class Cliente {
     	}
 	}
 	
-	public void conectar() {
+	public int conectar() {
 		// implementar check
 		// implementar check
 		// implementar check
@@ -152,16 +158,25 @@ public class Cliente {
 		
 		if (estado == 0) {
 			try {
-				// Crear un flujo de salida
-				output = new DataOutputStream(socket.getOutputStream());
-	
-				// Crear un HiloLector para leer mensajes del servidor constantemente
-				HiloLectorCliente task = new HiloLectorCliente(this);
-	
-				Thread thread = new Thread(task);
-				thread.start();
+				// Solicitar "hueco" en el servidor
+				String mensaje = new DataInputStream(socket.getInputStream()).readUTF();
 				
-				estado = 1;
+				System.out.println("mensaje de entrada: " + mensaje);
+				
+				if (mensaje.equals("S_lleno_#no#mas#peticiones#_"))
+					System.out.println("denegado");
+				else { // Si servidor acepta petición:
+					// Crear un flujo de salida
+					output = new DataOutputStream(socket.getOutputStream());
+	
+					// Crear un HiloLector para leer mensajes del servidor constantemente
+					HiloLectorCliente task = new HiloLectorCliente(this);
+	
+					Thread thread = new Thread(task);
+					thread.start();
+	
+					estado = 1;
+				}
 			} catch (IOException ex) {
 				estado = -1;
 				
@@ -171,6 +186,8 @@ public class Cliente {
 				System.out.println("-----------------------------------------------------------");
 			}
 		}
+		
+		return estado;
 	}
 
 }

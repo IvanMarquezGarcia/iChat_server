@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.ConnectException;
 import java.net.Socket;
 import java.net.URL;
+import java.net.UnknownHostException;
 
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -54,10 +55,6 @@ public class ControladorClienteLogin {
 	public Cliente getCliente() {
 		return cliente;
 	}
-	/*
-	public void setNombreDatos(String nombre) {
-		nombreDatos_textField.setText(nombre);
-	}*/
 	
 	public void setNombreDatos() {
 		nombreDatos_textField.setText(cliente.getNombre());
@@ -113,35 +110,43 @@ public class ControladorClienteLogin {
 					
 					cliente.setNombre(nombre);
 			    	cliente.setSocket(s);
-			        
-			        // Abrir ventana de chat
-			        URL rutaVistaCliente = getClass().getResource("/view/VistaClienteChat.fxml");
-			    	FXMLLoader vistaClienteLoader = new FXMLLoader(rutaVistaCliente);
 			    	
-			    	ControladorClienteChat cc = new ControladorClienteChat(cliente);
+			    	System.out.println("-------" + nombre + "-------");
 			    	
-			    	vistaClienteLoader.setController(cc);
-			    	
-					try {
-						Scene scene = new Scene(vistaClienteLoader.load(), 530, 600);
-						
-						// Cerrar ventana de login
-				    	Node source = (Node) event.getSource();
-				        Stage stage = (Stage) source.getScene().getWindow();
-				        stage.close();
-						
-				        // Abrir ventana de chat cliente
-						stage.setTitle("Cliente de eiChat | " + cliente.getNombre());
-						stage.setScene(scene);
-				    	stage.show();
+			    	if (cliente.conectar() == 1) {
+			    		cliente.setError_text(error_text);
+			    		
+				        // Abrir ventana de chat
+				        URL rutaVistaCliente = getClass().getResource("/view/VistaClienteChat.fxml");
+				    	FXMLLoader vistaClienteLoader = new FXMLLoader(rutaVistaCliente);
 				    	
-				    	cliente.conectar();
-					} catch (IOException e) {
-						System.out.println("---------------------------------------------------------------------");
-						e.printStackTrace();
-						System.out.println("Error al cargar la ventana");
-						System.out.println("---------------------------------------------------------------------");
-					}
+				    	ControladorClienteChat cc = new ControladorClienteChat(cliente);
+				    	
+				    	vistaClienteLoader.setController(cc);
+				    	
+						try {
+							Scene scene = new Scene(vistaClienteLoader.load(), 530, 600);
+							
+							// Cerrar ventana de login
+					    	Node source = (Node) event.getSource();
+					        Stage stage = (Stage) source.getScene().getWindow();
+					        stage.close();
+							
+					        // Abrir ventana de chat cliente
+							stage.setTitle("Cliente de eiChat | " + cliente.getNombre());
+							stage.setScene(scene);
+					    	stage.show();
+						} catch (IOException e) {
+							System.out.println("---------------------------------------------------------------------");
+							e.printStackTrace();
+							System.out.println("Error al cargar la ventana");
+							System.out.println("---------------------------------------------------------------------");
+						}
+			    	}
+			    	else {
+			    		error_text.setText("Servidor lleno");
+			    		error_text.setVisible(true);
+			    	}
 	    		}
 	    		else {
 	    			error_text.setText("Puerto no válido");
@@ -149,6 +154,17 @@ public class ControladorClienteLogin {
 	    		}
 	    			
 			}
+	    	catch (UnknownHostException uhe) {
+	    		String errorMsg = "Host desconocido";
+	    		
+	    		System.out.println("---------------------------------------------------------------------");
+	    		uhe.printStackTrace();
+	    		System.out.println(errorMsg);
+				System.out.println("---------------------------------------------------------------------");
+				
+				error_text.setText(errorMsg);
+				error_text.setVisible(true);
+	    	}
 	    	catch (ConnectException ce) {
 	    		String errorMsg = "Error al conectar";
 	    		

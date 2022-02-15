@@ -63,6 +63,12 @@ public class ControladorServidor {
 	private Button desconectar_button;
 
 	@FXML
+    private Text infoDir_Text;
+
+    @FXML
+    private Text infoPuerto_Text;
+	
+	@FXML
 	private Text info_Text;
 
 	@FXML
@@ -93,6 +99,8 @@ public class ControladorServidor {
 	@FXML
 	public void initialize() {	    	
 		this.servidor.setTextArea(mensajes_textArea);
+		this.infoPuerto_Text.setText("Puerto: " + servidor.getPort());
+		this.infoDir_Text.setText("Host: " + servidor.getHost());
 		
 		root.setOnMousePressed(new EventHandler<MouseEvent>() {
             @Override

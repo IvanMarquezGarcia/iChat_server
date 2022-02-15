@@ -70,7 +70,7 @@ public class ControladorClienteChat {
 	public void initialize() {
 		this.cliente.setTextArea(mensajes_textArea);
 		nombre_Text.setText(cliente.getNombre());
-		cliente.errorText = error_text;
+		cliente.setError_text(error_text);
 		
 		root.setOnMousePressed(new EventHandler<MouseEvent>() {
             @Override
@@ -215,14 +215,12 @@ public class ControladorClienteChat {
     @FXML
     void enviar_buttonFXClicked(MouseEvent event) {
     	if (cliente.getEstado() == 1) {
-	    	try {
+    		try {
 	            String message = input_textField.getText().trim();
 	
-	            // Si el mensaje o username no son especificados
-	            // no se envía nada al servidor
 	            if (message.length() > 0) {
 	                // Enviar mensaje al servidor
-	                cliente.getOutput().writeUTF("[" + cliente.getNombre() + "]: " + message + "");
+	                cliente.getOutput().writeUTF("[" + cliente.getNombre() + "] > " + message + "");
 	                
 	                cliente.getOutput().flush(); // Limpiar flujo de salida
 	

@@ -51,7 +51,7 @@ public class HiloServidor implements Runnable {
 			// Iniciar flujos de entrada y salida
 			input = new DataInputStream(socketCliente.getInputStream());
 			output = new DataOutputStream(socketCliente.getOutputStream());
-
+			
 			while (servidor.isConectado() == true) {
 				// Reciber mensaje de cliente
 				String mensaje = input.readUTF();
@@ -72,7 +72,7 @@ public class HiloServidor implements Runnable {
 					output.close();
 					output = null;
 					
-					servidor.textArea.appendText("[" + new Date() + "] | [HOST: " + host + " PORT: " + port + "] - " +  + " se ha desconectado\n");
+					servidor.textArea.appendText("[" + new Date() + "] | [HOST: " + host + " PORT: " + port + "] - " + "cliente se ha desconectado\n");
 					
 					clienteDesconectado();
 					
@@ -134,7 +134,7 @@ public class HiloServidor implements Runnable {
 	
 	// Indicar que el cliente se ha desconectado
 	public void clienteDesconectado() {
-		servidor.setLimpiar(true);
+		servidor.limpiarConexiones();
 	}
 
 }

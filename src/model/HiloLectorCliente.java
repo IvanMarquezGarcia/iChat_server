@@ -58,7 +58,7 @@ public class HiloLectorCliente implements Runnable {
     	}
     	catch (IOException ex) {
     		correcto = false;
-    		String errorMsg = "Error al crear el socket del cliente"; 
+    		String errorMsg = "Error al crear el socket del cliente";
             
     		if (socketCliente == null)
         		errorMsg = "Flujo de entrada cerrado";
@@ -83,13 +83,33 @@ public class HiloLectorCliente implements Runnable {
             try {
             	mensaje = input.readUTF();
             	
+            	/*if (mensaje.equals("|-_-.|/\\|.-_-|")) {
+            		cliente.errorText.setText("Servidor lleno");
+            		cliente.errorText.setVisible(true);
+            		
+            		mensaje = null;
+            		
+            		cliente.desconectar();
+            	}*/
+            	
+            	if (mensaje.equals("S_lleno_#no#mas#peticiones#_")) {
+            		cliente.errorText.setText("Servidor lleno");
+            		cliente.errorText.setVisible(true);
+            		
+            		System.out.println("ILLO, EL SERVIDOR ESTÁ LLENO");
+            		
+            		mensaje = null;
+            		
+            		cliente.desconectar();
+            	}// S_lleno_#no#mas#peticiones#_
+            	
             	if (mensaje.equals("|/\\\\/\\//\\|")) {
             		cliente.errorText.setText("Servidor desconectado");
             		cliente.errorText.setVisible(true);
             		
-					cliente.desconectar();
-					
 					mensaje = null;
+					
+					cliente.desconectar();
             	}
             }
             catch(SocketException se) {
