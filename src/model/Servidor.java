@@ -24,9 +24,9 @@ package model;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -40,7 +40,6 @@ public class Servidor {
 	private final int PORT;
 	private ServerSocket serverSocket;
 	private boolean conectado;
-	private boolean limpiar;
 	private int numMaxConx;
 	public TextArea textArea;
 
@@ -62,7 +61,6 @@ public class Servidor {
 		this.PORT = port;
 		this.numMaxConx = max;
 		conectado = false;
-		limpiar = false;
 	}
 
 
@@ -82,10 +80,6 @@ public class Servidor {
 		this.textArea = txt;
 	}
 
-	public void setLimpiar(boolean b) {
-		this.limpiar = b;
-	}
-
 	public ArrayList<HiloServidor> getConexiones() {
 		return listaConexiones;
 	}
@@ -98,9 +92,9 @@ public class Servidor {
 
 	// Enviar mensaje a todos los clientes
 	public void mensajeParaTodos(String message) {
-		for (HiloServidor clientConnection : this.listaConexiones) {
-			if (clientConnection.socketCliente != null)
-				clientConnection.sendMessage(message);
+		for (HiloServidor hls : this.listaConexiones) {
+			if (hls.getCliente().getSocket() != null)
+				hls.sendMessage(message);
 		}
 	}
 
@@ -114,24 +108,24 @@ public class Servidor {
 
 			try {
 				if (listaConexiones.size() > 0) {
-					Iterator hlsIterator = listaConexiones.iterator();
+					Iterator<HiloServidor> clientesIterator = listaConexiones.iterator();
 
-					while (hlsIterator.hasNext() == true) {
-						HiloServidor hls = (HiloServidor) hlsIterator.next();
+					while (clientesIterator.hasNext() == true) {
+						HiloServidor hls = (HiloServidor) clientesIterator.next();
 
-						if (hls != null && hls.socketCliente != null) {
-							if (hls.socketCliente.isInputShutdown() == false)
-								hls.socketCliente.shutdownInput();
+						if (hls != null && hls.getCliente().getSocket() != null) {
+							if (hls.getCliente().getSocket().isInputShutdown() == false)
+								hls.getCliente().getSocket().shutdownInput();
 
-							if (hls.socketCliente.isOutputShutdown() == false)
-								hls.socketCliente.shutdownOutput();
+							if (hls.getCliente().getSocket().isOutputShutdown() == false)
+								hls.getCliente().getSocket().shutdownOutput();
 
-							if (hls.socketCliente.isClosed() == false) {
-								hls.socketCliente.close();
-								hls.socketCliente = null;
+							if (hls.getCliente().getSocket().isClosed() == false) {
+								hls.getCliente().getSocket().close();
+								Socket s = hls.getCliente().getSocket(); s = null;
 							}
 
-							hlsIterator.remove();
+							clientesIterator.remove();
 						}
 					}
 				}
@@ -157,14 +151,13 @@ public class Servidor {
 	public void limpiarConexiones() {
 		System.out.println("------------------------------------------------------------");
 		System.out.println("número de conexiones antes de limpiar " + listaConexiones.size());
-		limpiar = false;
 
 		Iterator<HiloServidor> iteradorConexiones = listaConexiones.iterator();
 
 		while(iteradorConexiones.hasNext()) {
-			HiloServidor hls = iteradorConexiones.next();
+			HiloServidor hls= (HiloServidor) iteradorConexiones.next();
 
-			if (hls.socketCliente == null) {
+			if (hls.getCliente().getSocket().isClosed()) {
 				iteradorConexiones.remove();
 				hls = null;
 			}
@@ -204,14 +197,10 @@ public class Servidor {
 
 						if (numMaxConx != -1 && numMaxConx <= listaConexiones.size()) {
 							output.writeUTF("S_lleno_#no#mas#peticiones#_"); // String para indicar que servidor está lleno
-							System.out.println("ILLO, NO TE DEJO ENTRAR");
-
 							socketNuevoCliente.close();
 						}
-						else {
+						else
 							output.writeUTF("aceptado"); // String para indicar que servidor está lleno
-							System.out.println("ILLO, QUE DICE EL TÍO");
-						}
 					}
 					catch(IOException e) {
 						System.out.println("-----------------------------------------------------------");
@@ -220,19 +209,37 @@ public class Servidor {
 						System.out.println("-----------------------------------------------------------");
 					}
 
-					if (socketNuevoCliente.isClosed() == false) {
-						textArea.appendText("[" + new Date() + "] | [HOST: " + socketNuevoCliente.getInetAddress().getHostAddress() + " PORT: " + socketNuevoCliente.getPort() + "] - Nuevo cliente conectado\n");
-
+					if (socketNuevoCliente != null && socketNuevoCliente.isClosed() == false) {
+						// Recontruir cliente recibido
+						ObjectInputStream ois = new ObjectInputStream(socketNuevoCliente.getInputStream()); 
+						Cliente c = (Cliente) ois.readObject();
+						c.setSocket(socketNuevoCliente);
+						c.setOutput(new DataOutputStream(c.getSocket().getOutputStream()));
+						
+						// Informar al resto de clientes conectados
+						mensajeParaTodos("\t\t>> " + c.getNombre() + " se ha conectado <<");
+						if (listaConexiones.size() > 0)
+							Platform.runLater(() -> {
+								textArea.appendText("[" + new Date() + "] | [HOST: " + c.getSocket().getInetAddress().getHostAddress() + " PORT: " + c.getSocket().getPort() + "] - " + listaConexiones.get(listaConexiones.size() - 1).getCliente().getNombre() + " conectado\n");
+							});
+						
 						// Añadir la nueva conexión a la lista de conexiones
-						HiloServidor connection = new HiloServidor(socketNuevoCliente, this);
+						HiloServidor connection = new HiloServidor(c, this);
 						listaConexiones.add(connection);
-
-						// Crear y ejecutar un nuevo hilo para la conexión
+						
+						// Crear y ejecutar un nuevo hilo para la comunicacón con el cliente
 						Thread thread = new Thread(connection);
 						thread.start();
 					}
 				}
-			} catch (IOException ex) {
+			}
+			catch (ClassNotFoundException cnfe) {
+				System.out.println("-----------------------------------------------------------");
+				cnfe.printStackTrace();
+				System.out.println("Error al encontrar la clase < Cliente >");
+				System.out.println("-----------------------------------------------------------");
+			}
+			catch (IOException ex) {
 				System.out.println("-----------------------------------------------------------");
 				ex.printStackTrace();
 				System.out.println("Error al abrir el socket del servidor");

@@ -35,22 +35,34 @@ import javafx.application.Platform;
 
 public class HiloServidor implements Runnable {
 
-	Socket socketCliente;
-	Servidor servidor;
-	DataInputStream input;
-	DataOutputStream output;
+	private Cliente cliente;
+	private Servidor servidor;
+	private DataInputStream input;
+	private DataOutputStream output;
 
-	public HiloServidor(Socket socket, Servidor server) {
-		this.socketCliente = socket;
-		this.servidor = server;
+	public HiloServidor(Cliente cliente, Servidor servidor) {
+		this.cliente = cliente;
+		this.servidor = servidor;
 	}
+
+	public Cliente getCliente() {
+		return cliente;
+	}
+
+	public void setCliente(Cliente cliente) {
+		this.cliente = cliente;
+	}
+
+
 
 	@Override
 	public void run() {
 		try {
 			// Iniciar flujos de entrada y salida
-			input = new DataInputStream(socketCliente.getInputStream());
-			output = new DataOutputStream(socketCliente.getOutputStream());
+			input = new DataInputStream(cliente.getSocket().getInputStream());
+			output = new DataOutputStream(cliente.getSocket().getOutputStream());
+			if (output != null)
+				System.out.println("output iniciado con valor");
 			
 			while (servidor.isConectado() == true) {
 				// Reciber mensaje de cliente
@@ -58,13 +70,12 @@ public class HiloServidor implements Runnable {
 
 				// String para indicar la desconexión: |/\\\\/\\//\\|
 				if (mensaje.equals("|/\\\\/\\//\\|")) {
-					String host = socketCliente.getInetAddress().getHostName();
-					int port = socketCliente.getPort();
+					String host = cliente.getSocket().getInetAddress().getHostName();
+					int port = cliente.getSocket().getPort();
 					
-					socketCliente.shutdownInput();
-					socketCliente.shutdownOutput();
-					socketCliente.close();
-					socketCliente = null;
+					cliente.getSocket().shutdownInput();
+					cliente.getSocket().shutdownOutput();
+					cliente.getSocket().close();
 					
 					input.close();
 					input = null;
@@ -80,7 +91,8 @@ public class HiloServidor implements Runnable {
 				}
 				else {
 					// Enviar mensaje a todos
-					servidor.mensajeParaTodos(mensaje);
+					if (output != null)
+						servidor.mensajeParaTodos(mensaje);
 	
 					// Mostrar mensaje en el área de texto
 					Platform.runLater(() -> {                    
@@ -103,8 +115,9 @@ public class HiloServidor implements Runnable {
 		}
 		finally {
 			try {
-				if (socketCliente != null && socketCliente.isClosed() == false)
-					socketCliente.close();
+				Socket s = cliente.getSocket(); // crear objeto para poder comparar
+				if (/*s != null && */s.isClosed() == false)
+					cliente.getSocket().close();
 			}
 			catch (IOException ex) {
 				System.out.println("-----------------------------------------------------------");
@@ -120,15 +133,15 @@ public class HiloServidor implements Runnable {
 	// optimizar servidor
 	public void sendMessage(String message) {
 		try {
-			output.writeUTF(message);
-			output.flush();
+			cliente.getOutput().writeUTF(message);
+			cliente.getOutput().flush();
 
 		} catch (IOException ex) {
 			System.out.println("-----------------------------------------------------------");
 			ex.printStackTrace();
 			System.out.println("Error al enviar el mensaje al servidor");
 			System.out.println("-----------------------------------------------------------");
-		} 
+		}
 	}
 	
 	

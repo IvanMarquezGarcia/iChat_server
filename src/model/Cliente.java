@@ -28,7 +28,8 @@ package model;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.net.Socket;
 import java.net.SocketException;
 
@@ -38,12 +39,12 @@ import javafx.scene.text.Text;
 
 
 
-public class Cliente {
+public class Cliente implements Serializable {
 
 	private String nombre;
 	private byte estado;	// -1 = error; 0 = desconectado; 1 = conectado;
-	private Socket socket;
-	private DataOutputStream output;
+	private transient Socket socket;
+	private transient DataOutputStream output;
 	public Text errorText;
 	public TextArea textArea;
 
@@ -97,6 +98,10 @@ public class Cliente {
 	public Socket getSocket() {
 		return socket;
 	}
+	
+	public void setOutput(DataOutputStream dos) {
+		this.output = dos;
+	}
 
 	public DataOutputStream getOutput() {
 		return output;
@@ -146,6 +151,19 @@ public class Cliente {
     	}
 	}
 	
+	public void sendMessage(String message) {
+		try {
+			output.writeUTF(message);
+			output.flush();
+
+		} catch (IOException ex) {
+			System.out.println("-----------------------------------------------------------");
+			ex.printStackTrace();
+			System.out.println("Error al enviar el mensaje al servidor");
+			System.out.println("-----------------------------------------------------------");
+		}
+	}
+	
 	public int conectar() {
 		// implementar check
 		// implementar check
@@ -168,6 +186,10 @@ public class Cliente {
 				else { // Si servidor acepta petición:
 					// Crear un flujo de salida
 					output = new DataOutputStream(socket.getOutputStream());
+					
+					
+					ObjectOutputStream oos = new ObjectOutputStream(this.socket.getOutputStream());
+					oos.writeObject(this);
 	
 					// Crear un HiloLector para leer mensajes del servidor constantemente
 					HiloLectorCliente task = new HiloLectorCliente(this);

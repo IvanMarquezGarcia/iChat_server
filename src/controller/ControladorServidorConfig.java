@@ -108,7 +108,7 @@ public class ControladorServidorConfig {
     	    	    	fxmlLoader.setController(cs);
     	    	    	
     	    			try {    				
-    	    		        Scene scene = new Scene(fxmlLoader.load(), 785, 895);
+    	    		        Scene scene = new Scene(fxmlLoader.load(), 785, 726);
     	    				
     	    				// Cerrar ventana de datos
     	    		    	Node source = (Node) event.getSource();
