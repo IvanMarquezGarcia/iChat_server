@@ -12,7 +12,7 @@
 
 	------------------------------- DESCRIPCIÓN -------------------------------
 	Representa un hilo que se encarga de las tareas de una conexión (leer
-	desde el cliente y enviar al resto).
+	y enviar al resto desde el cliente asociado a este hilo).
  */
 
 
@@ -25,8 +25,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import java.net.Socket;
 import java.net.SocketException;
+
 import java.util.Date;
 
 import javafx.application.Platform;
@@ -86,7 +86,7 @@ public class HiloServidor implements Runnable {
 					// Informar al resto de clientes conectados
 					Platform.runLater(() -> {
 						servidor.textArea.appendText("[" + new Date() + "] | [HOST: " + host + " PORT: " + port + "] - " + cliente.getNombre() + " se ha desconectado\n");
-						servidor.mensajeParaTodos("\t\t>> " + cliente.getNombre() + " se ha desconectado <<");
+						servidor.mensajeParaTodos("\t\t>> " + cliente.getNombre() + " se ha desconectado <<", this);
 					});
 					
 					break;
@@ -94,7 +94,7 @@ public class HiloServidor implements Runnable {
 				else {
 					// Enviar mensaje a todos
 					if (output != null)
-						servidor.mensajeParaTodos(mensaje);
+						servidor.mensajeParaTodos(mensaje, this);
 	
 					// Mostrar mensaje en el área de texto
 					Platform.runLater(() -> {                    
@@ -129,10 +129,8 @@ public class HiloServidor implements Runnable {
 		}
 	}
 
-	
-	// Enviar mensaje de vuelta a cliente - sustituir en el cliente para
-	// optimizar servidor
-	public void sendMessage(String message) {
+	// Enviar mensaje al cliente asociado a este hilo del servidor
+	public void mensajeExclusivo(String message) {
 		try {
 			cliente.getOutput().writeUTF(message);
 			cliente.getOutput().flush();
@@ -140,7 +138,7 @@ public class HiloServidor implements Runnable {
 		} catch (IOException ex) {
 			System.out.println("-----------------------------------------------------------");
 			ex.printStackTrace();
-			System.out.println("Error al enviar el mensaje al servidor");
+			System.out.println("Error al enviar el mensaje al cliente");
 			System.out.println("-----------------------------------------------------------");
 		}
 	}

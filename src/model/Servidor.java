@@ -91,10 +91,18 @@ public class Servidor {
 
 
 	// Enviar mensaje a todos los clientes
-	public void mensajeParaTodos(String message) {
-		for (HiloServidor hls : this.listaConexiones) {
-			if (hls.getCliente().getSocket() != null)
-				hls.sendMessage(message);
+	public void mensajeParaTodos(String mensaje, HiloServidor hlsEmisor) {
+		if (hlsEmisor == null) { // enviar a todos
+			for (HiloServidor hls : this.listaConexiones) {
+				if (hls.getCliente().getSocket() != null)
+					hls.mensajeExclusivo(mensaje);
+			}
+		}
+		else { // enviar a todos excepto a emisor
+			for (HiloServidor hls : this.listaConexiones) {
+				if (hls.getCliente().getSocket() != null && hls.equals(hlsEmisor) == false)
+					hls.mensajeExclusivo(mensaje);
+			}
 		}
 	}
 
@@ -103,7 +111,7 @@ public class Servidor {
 		if (conectado == true) {
 			conectado = false;
 			
-			mensajeParaTodos("|/\\\\/\\//\\|");
+			mensajeParaTodos("|/\\\\/\\//\\|", null);
 			
 			//limpiarConexiones();
 
@@ -267,20 +275,18 @@ public class Servidor {
 							c.setSocket(socketNuevoCliente);
 							c.setOutput(new DataOutputStream(c.getSocket().getOutputStream()));
 							
-							System.out.println("tamaño de la lista al informar " + listaConexiones.size());
+							// Añadir la nueva conexión a la lista de conexiones
+							HiloServidor hls = new HiloServidor(c, this);
+							listaConexiones.add(hls);
+							
 							// Informar al resto de clientes conectados
 							Platform.runLater(() -> {
-								if (listaConexiones.size() > 0)
-									mensajeParaTodos("\t\t>> " + c.getNombre() + " se ha conectado <<");
+								mensajeParaTodos("\t\t>> " + c.getNombre() + " se ha conectado <<", hls);
 								textArea.appendText("[" + new Date() + "] | [HOST: " + c.getSocket().getInetAddress().getHostAddress() + " PORT: " + c.getSocket().getPort() + "] - " + c.getNombre() + " se ha conectado\n");
 							});
 							
-							// Añadir la nueva conexión a la lista de conexiones
-							HiloServidor connection = new HiloServidor(c, this);
-							listaConexiones.add(connection);
-							
 							// Crear y ejecutar un nuevo hilo para la comunicacón con el cliente
-							Thread thread = new Thread(connection);
+							Thread thread = new Thread(hls);
 							thread.start();
 						}
 					}

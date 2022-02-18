@@ -21,7 +21,7 @@ package controller;
 
 
 
-import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.URL;
@@ -37,6 +37,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 
 import javafx.scene.layout.HBox;
@@ -44,7 +45,6 @@ import javafx.scene.layout.VBox;
 
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import model.Cliente;
 
 
@@ -89,6 +89,16 @@ public class ControladorClienteChat {
             	((Stage) root.getScene().getWindow()).setY(event.getScreenY() + yOffset);
             }
         });
+		
+		EventHandler<KeyEvent> eh = new EventHandler<KeyEvent>() {
+			@Override
+			public void handle(KeyEvent e) {
+				if (e.getCode() == KeyCode.ENTER)
+					enviarMensaje();
+			}
+		};
+		
+		root.setOnKeyReleased(eh);
 	}
 	
 	
