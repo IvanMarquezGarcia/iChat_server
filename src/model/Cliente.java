@@ -41,12 +41,13 @@ import javafx.scene.text.Text;
 
 public class Cliente implements Serializable {
 
+	private static final long serialVersionUID = 3294218137349451778L;
 	private String nombre;
 	private byte estado;	// -1 = error; 0 = desconectado; 1 = conectado;
 	private transient Socket socket;
 	private transient DataOutputStream output;
-	public Text errorText;
-	public TextArea textArea;
+	public transient Text errorText;
+	public transient TextArea textArea;
 
 	// host y puerto del servidor
 //	private String hostServidor;
@@ -151,7 +152,7 @@ public class Cliente implements Serializable {
     	}
 	}
 	
-	public void sendMessage(String message) {
+	/*public void sendMessage(String message) {
 		try {
 			output.writeUTF(message);
 			output.flush();
@@ -162,7 +163,7 @@ public class Cliente implements Serializable {
 			System.out.println("Error al enviar el mensaje al servidor");
 			System.out.println("-----------------------------------------------------------");
 		}
-	}
+	}*/
 	
 	public int conectar() {
 		// implementar check

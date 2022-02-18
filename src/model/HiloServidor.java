@@ -61,8 +61,6 @@ public class HiloServidor implements Runnable {
 			// Iniciar flujos de entrada y salida
 			input = new DataInputStream(cliente.getSocket().getInputStream());
 			output = new DataOutputStream(cliente.getSocket().getOutputStream());
-			if (output != null)
-				System.out.println("output iniciado con valor");
 			
 			while (servidor.isConectado() == true) {
 				// Reciber mensaje de cliente
@@ -83,9 +81,13 @@ public class HiloServidor implements Runnable {
 					output.close();
 					output = null;
 					
-					servidor.textArea.appendText("[" + new Date() + "] | [HOST: " + host + " PORT: " + port + "] - " + "cliente se ha desconectado\n");
-					
 					clienteDesconectado();
+					
+					// Informar al resto de clientes conectados
+					Platform.runLater(() -> {
+						servidor.textArea.appendText("[" + new Date() + "] | [HOST: " + host + " PORT: " + port + "] - " + cliente.getNombre() + " se ha desconectado\n");
+						servidor.mensajeParaTodos("\t\t>> " + cliente.getNombre() + " se ha desconectado <<");
+					});
 					
 					break;
 				}
@@ -115,8 +117,7 @@ public class HiloServidor implements Runnable {
 		}
 		finally {
 			try {
-				Socket s = cliente.getSocket(); // crear objeto para poder comparar
-				if (/*s != null && */s.isClosed() == false)
+				if (cliente.getSocket().isClosed() == false)
 					cliente.getSocket().close();
 			}
 			catch (IOException ex) {

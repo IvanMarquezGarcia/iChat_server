@@ -21,6 +21,7 @@ package controller;
 
 
 
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.URL;
@@ -35,6 +36,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 
 import javafx.scene.layout.HBox;
@@ -214,6 +216,11 @@ public class ControladorClienteChat {
     
     @FXML
     void enviar_buttonFXClicked(MouseEvent event) {
+    	enviarMensaje();
+    }
+    
+    
+    public void enviarMensaje() {
     	if (cliente.getEstado() == 1) {
     		try {
 	            String message = input_textField.getText().trim();

@@ -102,12 +102,34 @@ public class Servidor {
 	public void desconectar() {
 		if (conectado == true) {
 			conectado = false;
-
-			limpiarConexiones();
+			
 			mensajeParaTodos("|/\\\\/\\//\\|");
+			
+			//limpiarConexiones();
 
 			try {
+				/*
 				if (listaConexiones.size() > 0) {
+					while (listaConexiones.size() > 0) {
+						HiloServidor hls = (HiloServidor) listaConexiones.get(0);
+
+						if (hls != null && hls.getCliente().getSocket() != null) {
+							if (hls.getCliente().getSocket().isInputShutdown() == false)
+								hls.getCliente().getSocket().shutdownInput();
+
+							if (hls.getCliente().getSocket().isOutputShutdown() == false)
+								hls.getCliente().getSocket().shutdownOutput();
+
+							if (hls.getCliente().getSocket().isClosed() == false) {
+								hls.getCliente().getSocket().close();
+								Socket s = hls.getCliente().getSocket(); s = null;
+							}
+							
+							hls = null;
+							
+							listaConexiones.remove(0);
+						}
+					}
 					Iterator<HiloServidor> clientesIterator = listaConexiones.iterator();
 
 					while (clientesIterator.hasNext() == true) {
@@ -128,7 +150,7 @@ public class Servidor {
 							clientesIterator.remove();
 						}
 					}
-				}
+				}*/
 
 				if (serverSocket != null && serverSocket.isClosed() == false) {
 					String host = serverSocket.getInetAddress().getHostName();
@@ -148,28 +170,57 @@ public class Servidor {
 		}
 	}
 
+	
 	public void limpiarConexiones() {
 		System.out.println("------------------------------------------------------------");
 		System.out.println("número de conexiones antes de limpiar " + listaConexiones.size());
 
-		Iterator<HiloServidor> iteradorConexiones = listaConexiones.iterator();
-
-		while(iteradorConexiones.hasNext()) {
-			HiloServidor hls= (HiloServidor) iteradorConexiones.next();
-
-			if (hls.getCliente().getSocket().isClosed()) {
-				iteradorConexiones.remove();
-				hls = null;
+		for (int i = 0; i < listaConexiones.size(); i++) {
+			if (listaConexiones.get(i).getCliente().getSocket().isClosed()) {
+				System.out.println("\t-" + listaConexiones.get(i).getCliente().getNombre() + " eliminado");
+				listaConexiones.remove(i);
 			}
 		}
+		
+		if (listaConexiones.size() > 0) {
+			System.out.println("\n");
+			for (int i = 0; i < listaConexiones.size(); i++) {
+				System.out.println("\t-" + listaConexiones.get(i).getCliente().getNombre() + " conectado");
+			}
+		}
+		
+		
+//		Iterator<HiloServidor> iteradorConexiones = listaConexiones.iterator();
+//
+//		while(iteradorConexiones.hasNext()) {
+//			HiloServidor hls= (HiloServidor) iteradorConexiones.next();
+//
+//			if (hls.getCliente().getSocket().isClosed()) {
+//				System.out.println("\t-" + hls.getCliente().getNombre() + " eliminado");
+//				iteradorConexiones.remove();
+//				hls = null;
+//			}
+//		}
+//		
+//		if (listaConexiones.size() > 0) {
+//			iteradorConexiones = null;
+//			
+//			iteradorConexiones = listaConexiones.iterator();
+//			
+//			System.out.println("\n");
+//			while(iteradorConexiones.hasNext()) {
+//				System.out.println("\t-" + iteradorConexiones.next().getCliente().getNombre() + " conectado");
+//			}
+//		}
+//
+	//	listaConexiones.trimToSize();
+	//	System.gc();
 
-		listaConexiones.trimToSize();
-		System.gc();
-
-		System.out.println("------------------------------------------------------------");
 		System.out.println("número de conexiones despues de limpiar " + listaConexiones.size());
+		System.out.println("------------------------------------------------------------");
 	}
 
+	
 	public void arrancar() {
 		conectado = true;
 
@@ -178,58 +229,60 @@ public class Servidor {
 			try {
 				// Crear ServerSocket
 				serverSocket = new ServerSocket(PORT);
-				
-				String arrBytes = serverSocket.getInetAddress().getHostAddress();
-				System.out.println(new String((arrBytes)));
 
 				// Indicar en el área de texto que el servidor se ha iniciado
-				Platform.runLater(()
-						-> textArea.appendText("[" + new Date() + "] | [HOST: " + serverSocket.getInetAddress().getHostAddress() + " PORT: " + serverSocket.getLocalPort() + "] - Servidor iniciado\n"));
+				Platform.runLater(() ->
+					textArea.appendText("[" + new Date() + "] | [HOST: " + serverSocket.getInetAddress().getHostAddress() + " PORT: " + serverSocket.getLocalPort() + "] - Servidor iniciado\n"
+				));
 
-				while (conectado == true) {                	
-					// Escuchar peticiones de conexión
-					Socket socketNuevoCliente = null;
-					try {
-						socketNuevoCliente = serverSocket.accept();
-						System.out.println("nuevo cliente solicita entrar");
-
-						DataOutputStream output = new DataOutputStream(socketNuevoCliente.getOutputStream());
-
-						if (numMaxConx != -1 && numMaxConx <= listaConexiones.size()) {
-							output.writeUTF("S_lleno_#no#mas#peticiones#_"); // String para indicar que servidor está lleno
-							socketNuevoCliente.close();
+				while (conectado == true) {
+					synchronized(this) {
+						// Escuchar peticiones de conexión
+						Socket socketNuevoCliente = null;
+						try {
+							System.out.println("Escuchando con " + listaConexiones.size() + " clientes conectados");
+							socketNuevoCliente = serverSocket.accept();
+							System.out.println("nuevo cliente solicita entrar");
+	
+							DataOutputStream output = new DataOutputStream(socketNuevoCliente.getOutputStream());
+	
+							if (numMaxConx != -1 && numMaxConx <= listaConexiones.size()) {
+								output.writeUTF("S_lleno_#no#mas#peticiones#_"); // String para indicar que servidor está lleno
+								socketNuevoCliente.close();
+							}
+							else
+								output.writeUTF("aceptado"); // String para indicar que servidor está lleno
 						}
-						else
-							output.writeUTF("aceptado"); // String para indicar que servidor está lleno
-					}
-					catch(IOException e) {
-						System.out.println("-----------------------------------------------------------");
-						e.printStackTrace();
-						System.out.println("La escucha del servidor se ha interrumpido.");
-						System.out.println("-----------------------------------------------------------");
-					}
-
-					if (socketNuevoCliente != null && socketNuevoCliente.isClosed() == false) {
-						// Recontruir cliente recibido
-						ObjectInputStream ois = new ObjectInputStream(socketNuevoCliente.getInputStream()); 
-						Cliente c = (Cliente) ois.readObject();
-						c.setSocket(socketNuevoCliente);
-						c.setOutput(new DataOutputStream(c.getSocket().getOutputStream()));
-						
-						// Informar al resto de clientes conectados
-						mensajeParaTodos("\t\t>> " + c.getNombre() + " se ha conectado <<");
-						if (listaConexiones.size() > 0)
+						catch(IOException e) {
+							System.out.println("-----------------------------------------------------------");
+							e.printStackTrace();
+							System.out.println("La escucha del servidor se ha interrumpido.");
+							System.out.println("-----------------------------------------------------------");
+						}
+	
+						if (socketNuevoCliente != null && socketNuevoCliente.isClosed() == false) {
+							// Recontruir cliente recibido
+							ObjectInputStream ois = new ObjectInputStream(socketNuevoCliente.getInputStream()); 
+							Cliente c = (Cliente) ois.readObject();
+							c.setSocket(socketNuevoCliente);
+							c.setOutput(new DataOutputStream(c.getSocket().getOutputStream()));
+							
+							System.out.println("tamaño de la lista al informar " + listaConexiones.size());
+							// Informar al resto de clientes conectados
 							Platform.runLater(() -> {
-								textArea.appendText("[" + new Date() + "] | [HOST: " + c.getSocket().getInetAddress().getHostAddress() + " PORT: " + c.getSocket().getPort() + "] - " + listaConexiones.get(listaConexiones.size() - 1).getCliente().getNombre() + " conectado\n");
+								if (listaConexiones.size() > 0)
+									mensajeParaTodos("\t\t>> " + c.getNombre() + " se ha conectado <<");
+								textArea.appendText("[" + new Date() + "] | [HOST: " + c.getSocket().getInetAddress().getHostAddress() + " PORT: " + c.getSocket().getPort() + "] - " + c.getNombre() + " se ha conectado\n");
 							});
-						
-						// Añadir la nueva conexión a la lista de conexiones
-						HiloServidor connection = new HiloServidor(c, this);
-						listaConexiones.add(connection);
-						
-						// Crear y ejecutar un nuevo hilo para la comunicacón con el cliente
-						Thread thread = new Thread(connection);
-						thread.start();
+							
+							// Añadir la nueva conexión a la lista de conexiones
+							HiloServidor connection = new HiloServidor(c, this);
+							listaConexiones.add(connection);
+							
+							// Crear y ejecutar un nuevo hilo para la comunicacón con el cliente
+							Thread thread = new Thread(connection);
+							thread.start();
+						}
 					}
 				}
 			}
