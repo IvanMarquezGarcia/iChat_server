@@ -30,10 +30,11 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+
 import java.net.Socket;
 import java.net.SocketException;
 
-import javafx.scene.control.TextArea;
+import javafx.scene.control.ListView;
 
 import javafx.scene.text.Text;
 
@@ -47,7 +48,7 @@ public class Cliente implements Serializable {
 	private transient Socket socket;
 	private transient DataOutputStream output;
 	public transient Text errorText;
-	public transient TextArea textArea;
+	public transient ListView<Mensaje> listView;
 
 	// host y puerto del servidor
 //	private String hostServidor;
@@ -76,8 +77,8 @@ public class Cliente implements Serializable {
 		this.errorText = t;
 	}
 	
-	public void setTextArea(TextArea textArea) {
-		this.textArea = textArea;
+	public void setMensajesList(ListView<Mensaje> listView) {
+		this.listView = listView;
 	}
 	
 	public void setError_text(Text t) {

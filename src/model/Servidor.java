@@ -196,33 +196,6 @@ public class Servidor {
 				System.out.println("\t-" + listaConexiones.get(i).getCliente().getNombre() + " conectado");
 			}
 		}
-		
-		
-//		Iterator<HiloServidor> iteradorConexiones = listaConexiones.iterator();
-//
-//		while(iteradorConexiones.hasNext()) {
-//			HiloServidor hls= (HiloServidor) iteradorConexiones.next();
-//
-//			if (hls.getCliente().getSocket().isClosed()) {
-//				System.out.println("\t-" + hls.getCliente().getNombre() + " eliminado");
-//				iteradorConexiones.remove();
-//				hls = null;
-//			}
-//		}
-//		
-//		if (listaConexiones.size() > 0) {
-//			iteradorConexiones = null;
-//			
-//			iteradorConexiones = listaConexiones.iterator();
-//			
-//			System.out.println("\n");
-//			while(iteradorConexiones.hasNext()) {
-//				System.out.println("\t-" + iteradorConexiones.next().getCliente().getNombre() + " conectado");
-//			}
-//		}
-//
-	//	listaConexiones.trimToSize();
-	//	System.gc();
 
 		System.out.println("número de conexiones despues de limpiar " + listaConexiones.size());
 		System.out.println("------------------------------------------------------------");

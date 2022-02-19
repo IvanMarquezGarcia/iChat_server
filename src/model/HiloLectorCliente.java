@@ -23,7 +23,6 @@ package model;
 
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 
 import java.net.Socket;
@@ -96,8 +95,6 @@ public class HiloLectorCliente implements Runnable {
             		cliente.errorText.setText("Servidor lleno");
             		cliente.errorText.setVisible(true);
             		
-            		System.out.println("ILLO, EL SERVIDOR ESTÁ LLENO");
-            		
             		mensaje = null;
             		
             		cliente.desconectar();
@@ -134,7 +131,8 @@ public class HiloLectorCliente implements Runnable {
                 // imprimirla en el área de texto
             	String msg = mensaje;
                 Platform.runLater(() -> {
-                	cliente.textArea.appendText(msg + "\n");
+                	cliente.listView.getItems().add(new Mensaje(msg, false));
+                	cliente.listView.scrollTo(cliente.listView.getItems().size() - 1);
                 });
             }
         }

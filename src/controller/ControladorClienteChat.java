@@ -21,31 +21,43 @@ package controller;
 
 
 
-import java.awt.event.KeyListener;
 import java.io.IOException;
+
 import java.net.Socket;
 import java.net.URL;
 
 import javafx.event.EventHandler;
+
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+
 import javafx.scene.control.Button;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+
 import javafx.scene.image.ImageView;
+
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+
 import javafx.stage.Stage;
+
 import model.Cliente;
+import model.Mensaje;
+import model.MensajeCellFactory;
+import model.MensajeCellFactory;
 
 
 
@@ -70,7 +82,7 @@ public class ControladorClienteChat {
 	
 	@FXML
 	public void initialize() {
-		this.cliente.setTextArea(mensajes_textArea);
+		this.cliente.setMensajesList(mensajes_ListView);
 		nombre_Text.setText(cliente.getNombre());
 		cliente.setError_text(error_text);
 		
@@ -99,6 +111,10 @@ public class ControladorClienteChat {
 		};
 		
 		root.setOnKeyReleased(eh);
+		
+		
+		MensajeCellFactory mcf = new MensajeCellFactory();
+		mensajes_ListView.setCellFactory(mcf);
 	}
 	
 	
@@ -137,10 +153,7 @@ public class ControladorClienteChat {
     private TextField input_textField;
 
     @FXML
-    private ScrollPane mensajes_scrollPane;
-
-    @FXML
-    private TextArea mensajes_textArea;
+    private ListView<Mensaje> mensajes_ListView;
 
     @FXML
     private Text nombre_Text;
@@ -233,15 +246,18 @@ public class ControladorClienteChat {
     public void enviarMensaje() {
     	if (cliente.getEstado() == 1) {
     		try {
-	            String message = input_textField.getText().trim();
+	            String mensaje = input_textField.getText().trim();
 	
-	            if (message.length() > 0) {
+	            if (mensaje.length() > 0) {
 	                // Enviar mensaje al servidor
-	                cliente.getOutput().writeUTF("[" + cliente.getNombre() + "] > " + message + "");
+	                cliente.getOutput().writeUTF("[" + cliente.getNombre() + "] > " + mensaje + "");
 	                
 	                cliente.getOutput().flush(); // Limpiar flujo de salida
 	
 	                input_textField.clear(); // Limpiar cuadro de escritura
+	                
+	                mensajes_ListView.getItems().add(new Mensaje(mensaje + " < [Tú]", true));
+	                mensajes_ListView.scrollTo(mensajes_ListView.getItems().size() - 1);
 	            }
 	        } catch (IOException ex) {
 	        	String errorMsg = "Error al enviar";
