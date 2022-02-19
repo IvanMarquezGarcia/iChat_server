@@ -11,8 +11,9 @@
 
 
 	------------------------------- DESCRIPCIÓN -------------------------------
-	Representa un hilo que se encarga de las tareas de una conexión (leer
-	y enviar al resto desde el cliente asociado a este hilo).
+
+	Representa un hilo que se encarga de las tareas de una conexión entre el
+	servidor y un cliente.
  */
 
 
@@ -40,11 +41,13 @@ public class HiloServidor implements Runnable {
 	private DataInputStream input;
 	private DataOutputStream output;
 
+	
 	public HiloServidor(Cliente cliente, Servidor servidor) {
 		this.cliente = cliente;
 		this.servidor = servidor;
 	}
 
+	
 	public Cliente getCliente() {
 		return cliente;
 	}
@@ -53,8 +56,15 @@ public class HiloServidor implements Runnable {
 		this.cliente = cliente;
 	}
 
-
-
+	
+	/*
+		ESTADO: FUNCIONAL 
+		
+		DESCRIPCIÓN:
+			Ejecuta la tarea de lectura de datos
+			servidor <- cliente de manera continua
+			he informa al resto de clientes.
+	*/
 	@Override
 	public void run() {
 		try {
@@ -66,7 +76,7 @@ public class HiloServidor implements Runnable {
 				// Reciber mensaje de cliente
 				String mensaje = input.readUTF();
 
-				// String para indicar la desconexión: |/\\\\/\\//\\|
+				// String para indicar la desconexión del cliente asociado: |/\\\\/\\//\\|
 				if (mensaje.equals("|/\\\\/\\//\\|")) {
 					String host = cliente.getSocket().getInetAddress().getHostName();
 					int port = cliente.getSocket().getPort();
@@ -81,11 +91,12 @@ public class HiloServidor implements Runnable {
 					output.close();
 					output = null;
 					
-					clienteDesconectado();
+					servidor.limpiarConexiones();
 					
 					// Informar al resto de clientes conectados
 					Platform.runLater(() -> {
-						servidor.textArea.appendText("[" + new Date() + "] | [HOST: " + host + " PORT: " + port + "] - " + cliente.getNombre() + " se ha desconectado\n");
+						servidor.textArea.appendText(	"[" + new Date() + "] | [HOST: " + host + " PORT: " + port + "] - " +
+														cliente.getNombre() + " se ha desconectado\n");
 						servidor.mensajeParaTodos("\t\t>> " + cliente.getNombre() + " se ha desconectado <<", this);
 					});
 					
@@ -105,13 +116,13 @@ public class HiloServidor implements Runnable {
 		}
 		catch(SocketException se) {
     		System.out.println("-----------------------------------------------------------");
-    		se.printStackTrace();
+    		//se.printStackTrace();
     		System.out.println("La escucha del servidor se ha interrumpido.");
     		System.out.println("-----------------------------------------------------------");
     	}
 		catch (IOException ioe) {
 			System.out.println("-----------------------------------------------------------");
-			ioe.printStackTrace();
+			//ioe.printStackTrace();
 			System.out.println("Error de e/s");
 			System.out.println("-----------------------------------------------------------");
 		}
@@ -122,14 +133,24 @@ public class HiloServidor implements Runnable {
 			}
 			catch (IOException ex) {
 				System.out.println("-----------------------------------------------------------");
-				ex.printStackTrace();
+				//ex.printStackTrace();
 				System.out.println("Error al cerrar el socket del cliente");
 				System.out.println("-----------------------------------------------------------");
 			}
 		}
 	}
 
-	// Enviar mensaje al cliente asociado a este hilo del servidor
+	
+	/*
+		ESTADO: FUNCIONAL 
+		
+		DESCRIPCIÓN:
+			Enviar mensaje al cliente asociado a este
+			hilo del servidor.
+		
+		PARÁMETROS:
+		 + String que representa el mensaje a enviar
+	*/
 	public void mensajeExclusivo(String message) {
 		try {
 			cliente.getOutput().writeUTF(message);
@@ -137,16 +158,10 @@ public class HiloServidor implements Runnable {
 
 		} catch (IOException ex) {
 			System.out.println("-----------------------------------------------------------");
-			ex.printStackTrace();
+			//ex.printStackTrace();
 			System.out.println("Error al enviar el mensaje al cliente");
 			System.out.println("-----------------------------------------------------------");
 		}
-	}
-	
-	
-	// Indicar que el cliente se ha desconectado
-	public void clienteDesconectado() {
-		servidor.limpiarConexiones();
 	}
 
 }

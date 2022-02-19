@@ -1,16 +1,38 @@
+/*
+	Hecho por:
+		Eloy Guillermo Villadóniga Márquez
+		e
+		Iván Márquez García
+
+	2° D.A.M.
+
+	Práctica "Chat Colectivo" - Programación de Servicios y Procesos
+
+
+
+	------------------------------- DESCRIPCIÓN -------------------------------
+	
+	Clase que se encarga de crear y mostrar mensajes en el ListView del chat.
+ */
+
+
+
 package model;
 
 
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 
 import javafx.scene.paint.Color;
+
 import javafx.util.Callback;
 
 

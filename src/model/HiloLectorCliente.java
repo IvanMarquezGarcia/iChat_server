@@ -13,7 +13,7 @@
 	------------------------------- DESCRIPCIÓN -------------------------------
 	
 	Permite al cliente recibir información del servidor de forma continua sin
-	limitar su capacidad de enviar información.
+	bloquear su capacidad de enviar información.
 */
 
 
@@ -46,9 +46,17 @@ public class HiloLectorCliente implements Runnable {
     }
 
     
-    
+    /*
+		ESTADO: FUNCIONAL 
+		
+		DESCRIPCIÓN:
+			Ejecuta la tarea de lectura de datos
+			cliente <- servidor de manera continua.
+	*/
     @Override 
     public void run() {
+    	// controla que se pare la escucha
+    	// si algo no va bien
     	boolean correcto = true;
     	
     	try {
@@ -63,7 +71,7 @@ public class HiloLectorCliente implements Runnable {
         		errorMsg = "Flujo de entrada cerrado";
         		
         		System.out.println("-----------------------------------------------------------");
-        		ex.printStackTrace();
+        		//ex.printStackTrace();
         		System.out.println(errorMsg);
         		System.out.println("-----------------------------------------------------------");
         		
@@ -82,15 +90,7 @@ public class HiloLectorCliente implements Runnable {
             try {
             	mensaje = input.readUTF();
             	
-            	/*if (mensaje.equals("|-_-.|/\\|.-_-|")) {
-            		cliente.errorText.setText("Servidor lleno");
-            		cliente.errorText.setVisible(true);
-            		
-            		mensaje = null;
-            		
-            		cliente.desconectar();
-            	}*/
-            	
+            	// Si el servidor está lleno
             	if (mensaje.equals("S_lleno_#no#mas#peticiones#_")) {
             		cliente.errorText.setText("Servidor lleno");
             		cliente.errorText.setVisible(true);
@@ -98,8 +98,9 @@ public class HiloLectorCliente implements Runnable {
             		mensaje = null;
             		
             		cliente.desconectar();
-            	}// S_lleno_#no#mas#peticiones#_
+            	}
             	
+            	// Si el servidor se ha desconectado
             	if (mensaje.equals("|/\\\\/\\//\\|")) {
             		cliente.errorText.setText("Servidor desconectado");
             		cliente.errorText.setVisible(true);
@@ -122,13 +123,13 @@ public class HiloLectorCliente implements Runnable {
             	correcto = false;
             	
             	System.out.println("-----------------------------------------------------------");
-            	ioe.printStackTrace();
+            	//ioe.printStackTrace();
             	System.out.println("Error de e/s.");
             	System.out.println("-----------------------------------------------------------");
             }
 
+            // Si el mensaje no es nulo, mostrarlo
             if (mensaje != null) {
-                // imprimirla en el área de texto
             	String msg = mensaje;
                 Platform.runLater(() -> {
                 	cliente.listView.getItems().add(new Mensaje(msg, false));
@@ -136,6 +137,6 @@ public class HiloLectorCliente implements Runnable {
                 });
             }
         }
-        }
+    }
     
 }

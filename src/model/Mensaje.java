@@ -1,3 +1,22 @@
+/*
+	Hecho por:
+		Eloy Guillermo Villadóniga Márquez
+		e
+		Iván Márquez García
+
+	2° D.A.M.
+
+	Práctica "Chat Colectivo" - Programación de Servicios y Procesos
+
+
+
+	------------------------------- DESCRIPCIÓN -------------------------------
+	
+	Representa a un mensaje del chat.
+ */
+
+
+
 package model;
 
 

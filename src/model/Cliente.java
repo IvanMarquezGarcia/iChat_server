@@ -13,10 +13,8 @@
 	------------------------------- DESCRIPCIÓN -------------------------------
 
 	Esta es la clase que representa al cliente. Este enviará y recibirá
-	mensajes a y desde el servidor y el resto de clientes conectados.
-
-	Usa la clase HiloLector (Runnable) para crear un nuevo hilo con el objetivo
-	de escuchar al servidor de forma constante.
+	mensajes a y desde el servidor usando las clases HiloLector e HiloServidor.
+	
  */
 
 
@@ -43,74 +41,58 @@ import javafx.scene.text.Text;
 public class Cliente implements Serializable {
 
 	private static final long serialVersionUID = 3294218137349451778L;
+	
 	private String nombre;
 	private byte estado;	// -1 = error; 0 = desconectado; 1 = conectado;
+	
 	private transient Socket socket;
 	private transient DataOutputStream output;
 	public transient Text errorText;
 	public transient ListView<Mensaje> listView;
 
-	// host y puerto del servidor
-//	private String hostServidor;
-//	private int portServidor;
-
 
 
 	public Cliente() {
-		// this("Anónimo", "localhost", 1234);
+		this("Anónimo");
 	}
 	
-	public Cliente(String nombre/*, String host, int port*/) {
+	public Cliente(String nombre) {
 		this.nombre = nombre;
 		this.estado = 0;
-//		this.hostServidor = host;
-//		this.portServidor = port;
 	}
 
 
 
-	public byte getEstado() {
-		return estado;
-	}
+	public byte getEstado() { return estado; }
 	
-	public void setErrorText(Text t) {
-		this.errorText = t;
-	}
+	public void setErrorText(Text t) { this.errorText = t; }
 	
-	public void setMensajesList(ListView<Mensaje> listView) {
-		this.listView = listView;
-	}
+	public void setMensajesList(ListView<Mensaje> listView) { this.listView = listView;	}
 	
-	public void setError_text(Text t) {
-		this.errorText = t;
-	}
+	public void setError_text(Text t) { this.errorText = t;	}
 	
-	public void setNombre(String n) {
-		this.nombre = n;
-	}
+	public void setNombre(String n) { this.nombre = n; }
 	
-	public String getNombre() {
-		return nombre;
-	}
+	public String getNombre() { return nombre; }
 	
-	public void setSocket(Socket s) {
-		this.socket = s;
-	}
+	public void setSocket(Socket s) { this.socket = s; }
 	
-	public Socket getSocket() {
-		return socket;
-	}
+	public Socket getSocket() { return socket; }
 	
-	public void setOutput(DataOutputStream dos) {
-		this.output = dos;
-	}
+	public void setOutput(DataOutputStream dos) { this.output = dos; }
 
-	public DataOutputStream getOutput() {
-		return output;
-	}
+	public DataOutputStream getOutput() { return output; }
 	
 	
 	
+	/*
+	ESTADO: FUNCIONAL 
+	
+	DESCRIPCIÓN:
+		Indica al servidor que el cliente se va a
+		desconectar y cierra los flujos del socket
+		del cliente y el propio socket 
+	*/
 	public void desconectar() {
 		try {
     		// Indicar desconexión al servidor
@@ -127,17 +109,12 @@ public class Cliente implements Serializable {
     			socket.close();
     			socket = null;
     		}
-    		/*
-	    	socket.shutdownInput();
-	    	socket.shutdownOutput();
-	    	socket.close();
-	    	socket = null;
-	    	*/
+    		
 	    	estado = 0;
     	}
 		catch(SocketException se) {
     		System.out.println("-----------------------------------------------------------");
-    		se.printStackTrace();
+    		//se.printStackTrace();
     		System.out.println("La comunicación con el servidor se ha interrumpido.");
     		System.out.println("-----------------------------------------------------------");
     		
@@ -147,35 +124,24 @@ public class Cliente implements Serializable {
     		estado = -1;
     		
     		System.out.println("-----------------------------------------------------------");
-    		ioe.printStackTrace();
+    		//ioe.printStackTrace();
     		System.out.println("Error al desconectar el cliente");
     		System.out.println("-----------------------------------------------------------");
     	}
 	}
 	
-	/*public void sendMessage(String message) {
-		try {
-			output.writeUTF(message);
-			output.flush();
-
-		} catch (IOException ex) {
-			System.out.println("-----------------------------------------------------------");
-			ex.printStackTrace();
-			System.out.println("Error al enviar el mensaje al servidor");
-			System.out.println("-----------------------------------------------------------");
-		}
-	}*/
 	
-	public int conectar() {
-		// implementar check
-		// implementar check
-		// implementar check
-		// implementar check
-		// implementar check
-		// implementar check
-		// implementar check
-		// implementar check
+	/*
+		ESTADO: FUNCIONAL 
 		
+		DESCRIPCIÓN:
+			Solicita conexión al servidor y conecta al
+			cliente con este.
+		
+		RETORNO:
+			int indicando el estado de conexión del cliente.
+	*/
+	public int conectar() {
 		if (estado == 0) {
 			try {
 				// Solicitar "hueco" en el servidor
@@ -205,7 +171,7 @@ public class Cliente implements Serializable {
 				estado = -1;
 				
 				System.out.println("-----------------------------------------------------------");
-				ex.printStackTrace();
+				//ex.printStackTrace();
 				System.out.println("Error al conectar con el servidor");
 				System.out.println("-----------------------------------------------------------");
 			}

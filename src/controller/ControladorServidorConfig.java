@@ -22,6 +22,7 @@ package controller;
 
 
 import java.io.IOException;
+
 import java.net.URL;
 
 import javafx.event.EventHandler;
@@ -31,10 +32,14 @@ import javafx.fxml.FXMLLoader;
 
 import javafx.scene.Node;
 import javafx.scene.Scene;
+
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+
 import javafx.scene.input.MouseEvent;
+
 import javafx.scene.layout.VBox;
+
 import javafx.scene.text.Text;
 
 import javafx.stage.Stage;
@@ -69,12 +74,50 @@ public class ControladorServidorConfig {
 
     @FXML
     private VBox root;
+    
+    
+    
+    @FXML
+    public void initialize() {
+    	// Hacer que la ventana se pueda mover
+    	root.setOnMousePressed(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                xOffset = ((Stage) root.getScene().getWindow()).getX() - event.getScreenX();
+                yOffset = ((Stage) root.getScene().getWindow()).getY() - event.getScreenY();
+            }
+        });
+		root.setOnMouseDragged(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+            	((Stage) root.getScene().getWindow()).setX(event.getScreenX() + xOffset);
+            	((Stage) root.getScene().getWindow()).setY(event.getScreenY() + yOffset);
+            }
+        });
+    }
 
+    
+    
+	/*
+		ESTADO: FUNCIONAL 
+		
+		DESCRIPCIÓN:
+			Cerrar aplicación.
+	*/
     @FXML
     void cerrar(MouseEvent event) {
     	System.exit(0);
     }
 
+    
+	/*
+		ESTADO: FUNCIONAL 
+		
+		DESCRIPCIÓN:
+			Abrir una ventana asociada a un servidor
+			con las características indicadas en la
+			vista asociada a este controlador.
+	*/
     @FXML
     void crear(MouseEvent event) {
     	error_text.setVisible(false);
@@ -122,7 +165,7 @@ public class ControladorServidorConfig {
     	    		    	stage.show();
     	    			} catch (IOException e) {
     	    				System.out.println("---------------------------------------------------------------------");
-    	    				e.printStackTrace();
+    	    				// e.printStackTrace();
     	    				System.out.println("Error al cargar la ventana");
     	    				System.out.println("---------------------------------------------------------------------");
     	    			}
@@ -134,7 +177,7 @@ public class ControladorServidorConfig {
     		}
     		catch(NumberFormatException nfe) {
     			System.out.println("---------------------------------------------------------------------");
-				nfe.printStackTrace();
+				// nfe.printStackTrace();
 				System.out.println("Puerto no válido");
 				System.out.println("---------------------------------------------------------------------");
     			
@@ -146,25 +189,6 @@ public class ControladorServidorConfig {
     		error_text.setText("Puerto no válido");
     		error_text.setVisible(true);
     	}
-    }
-    
-    @FXML
-    public void initialize() {
-    	root.setOnMousePressed(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                xOffset = ((Stage) root.getScene().getWindow()).getX() - event.getScreenX();
-                yOffset = ((Stage) root.getScene().getWindow()).getY() - event.getScreenY();
-            }
-        });
-		
-		root.setOnMouseDragged(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-            	((Stage) root.getScene().getWindow()).setX(event.getScreenX() + xOffset);
-            	((Stage) root.getScene().getWindow()).setY(event.getScreenY() + yOffset);
-            }
-        });
     }
 
 }

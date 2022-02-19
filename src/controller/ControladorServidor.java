@@ -22,18 +22,23 @@ package controller;
 
 
 import javafx.event.EventHandler;
+
 import javafx.fxml.FXML;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
+
 import javafx.scene.image.ImageView;
+
 import javafx.scene.input.MouseEvent;
 
 import javafx.scene.layout.VBox;
 
 import javafx.scene.text.Text;
+
 import javafx.stage.Stage;
+
 import model.Servidor;
 
 
@@ -80,28 +85,14 @@ public class ControladorServidor {
 	@FXML
 	private VBox root;
 
-	@FXML
-    void cerrarServidor(MouseEvent event) {
-		servidor.desconectar();
-		System.exit(0);
-    }
-	
-	@FXML
-	void desconectar(MouseEvent event) {
-		servidor.desconectar();
-	}
 
-	@FXML
-	void arrancar(MouseEvent event) {
-		servidor.arrancar();
-	}
-	
 	@FXML
 	public void initialize() {	    	
 		this.servidor.setTextArea(mensajes_textArea);
 		this.infoPuerto_Text.setText("Puerto: " + servidor.getPort());
 		this.infoDir_Text.setText("Host: " + servidor.getHost());
 		
+		// Hacer que la ventana se pueda mover
 		root.setOnMousePressed(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
@@ -109,7 +100,6 @@ public class ControladorServidor {
                 yOffset = ((Stage) root.getScene().getWindow()).getY() - event.getScreenY();
             }
         });
-		
 		root.setOnMouseDragged(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
@@ -117,6 +107,43 @@ public class ControladorServidor {
             	((Stage) root.getScene().getWindow()).setY(event.getScreenY() + yOffset);
             }
         });
+	}
+
+	
+	/*
+		ESTADO: FUNCIONAL 
+		
+		DESCRIPCIÓN:
+			Cerrar aplicación.
+	*/
+	@FXML
+    void cerrar(MouseEvent event) {
+		servidor.desconectar();
+		System.exit(0);
+    }
+	
+	
+	/*
+		ESTADO: FUNCIONAL 
+		
+		DESCRIPCIÓN:
+			Descnectar servidor.
+	*/
+	@FXML
+	void desconectar(MouseEvent event) {
+		servidor.desconectar();
+	}
+
+	
+	/*
+		ESTADO: FUNCIONAL 
+		
+		DESCRIPCIÓN:
+			Arrancar servidor.
+	*/
+	@FXML
+	void arrancar(MouseEvent event) {
+		servidor.arrancar();
 	}
 
 }

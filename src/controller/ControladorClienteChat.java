@@ -12,7 +12,7 @@
 	
 	------------------------------- DESCRIPCIÓN -------------------------------
 	
-	Controlador de la vista VistaCliene.fxml.
+	Controlador de la vista VistaClienteChat.fxml.
 */
 
 
@@ -30,12 +30,11 @@ import javafx.event.EventHandler;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
+
 import javafx.scene.Node;
 import javafx.scene.Scene;
 
 import javafx.scene.control.Button;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 
@@ -44,19 +43,17 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
+
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
+
+
 import javafx.scene.text.Text;
 
 import javafx.stage.Stage;
 
 import model.Cliente;
 import model.Mensaje;
-import model.MensajeCellFactory;
 import model.MensajeCellFactory;
 
 
@@ -79,45 +76,6 @@ public class ControladorClienteChat {
 	}
 	
 	
-	
-	@FXML
-	public void initialize() {
-		this.cliente.setMensajesList(mensajes_ListView);
-		nombre_Text.setText(cliente.getNombre());
-		cliente.setError_text(error_text);
-		
-		root.setOnMousePressed(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                xOffset = ((Stage) root.getScene().getWindow()).getX() - event.getScreenX();
-                yOffset = ((Stage) root.getScene().getWindow()).getY() - event.getScreenY();
-            }
-        });
-		
-		root.setOnMouseDragged(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-            	((Stage) root.getScene().getWindow()).setX(event.getScreenX() + xOffset);
-            	((Stage) root.getScene().getWindow()).setY(event.getScreenY() + yOffset);
-            }
-        });
-		
-		EventHandler<KeyEvent> eh = new EventHandler<KeyEvent>() {
-			@Override
-			public void handle(KeyEvent e) {
-				if (e.getCode() == KeyCode.ENTER)
-					enviarMensaje();
-			}
-		};
-		
-		root.setOnKeyReleased(eh);
-		
-		
-		MensajeCellFactory mcf = new MensajeCellFactory();
-		mensajes_ListView.setCellFactory(mcf);
-	}
-	
-	
     
 	public void setCliente(Cliente c) {
 		this.cliente = c;
@@ -126,11 +84,9 @@ public class ControladorClienteChat {
 	public Cliente getCliente() {
 		return cliente;
 	}
-	
-	
-	
-	
-	 
+
+
+ 
 	@FXML
 	private ImageView desconectar_ImageView;
 
@@ -161,8 +117,57 @@ public class ControladorClienteChat {
     @FXML
     private VBox root;
     
+    
+    
     @FXML
-    void cerrarChat(MouseEvent event) {
+	public void initialize() {
+		this.cliente.setMensajesList(mensajes_ListView);
+		nombre_Text.setText(cliente.getNombre());
+		cliente.setError_text(error_text);
+		
+		// Hacer que la ventana se pueda mover
+		root.setOnMousePressed(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                xOffset = ((Stage) root.getScene().getWindow()).getX() - event.getScreenX();
+                yOffset = ((Stage) root.getScene().getWindow()).getY() - event.getScreenY();
+            }
+        });
+		root.setOnMouseDragged(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+            	((Stage) root.getScene().getWindow()).setX(event.getScreenX() + xOffset);
+            	((Stage) root.getScene().getWindow()).setY(event.getScreenY() + yOffset);
+            }
+        });
+		
+		// Capturador de evento para la tecla ENTER
+		EventHandler<KeyEvent> eh = new EventHandler<KeyEvent>() {
+			@Override
+			public void handle(KeyEvent e) {
+				if (e.getCode() == KeyCode.ENTER)
+					enviarMensaje();
+			}
+		};
+		
+		// Asociar capturador de evento al nodo raíz
+		root.setOnKeyReleased(eh);
+		
+		// Instanciar MensajeCellFactory y asociar
+		// con el ListView del chat
+		MensajeCellFactory mcf = new MensajeCellFactory();
+		mensajes_ListView.setCellFactory(mcf);
+	}
+    
+    
+    /*
+		ESTADO: FUNCIONAL 
+		
+		DESCRIPCIÓN:
+			Cerrar aplicación.
+    */
+    @FXML
+    void cerrar(MouseEvent event) {
     	if (cliente.getEstado() == 1) {
 			cliente.desconectar();
 			
@@ -172,7 +177,6 @@ public class ControladorClienteChat {
 				System.out.println("---------------------------------------------------------------------");
 				System.out.println("Error al desconectar el cliente");
 				System.out.println("---------------------------------------------------------------------");
-				
 				System.exit(1);
 			}
     	}
@@ -190,25 +194,33 @@ public class ControladorClienteChat {
 				System.exit(0);
 			} catch (IOException e) {
 				System.out.println("---------------------------------------------------------------------");
-				e.printStackTrace();
+				//e.printStackTrace();
 				System.out.println("Error al desconectar el cliente");
 				System.out.println("---------------------------------------------------------------------");
-				
 				System.exit(1);
 			}
     	}
     }
     
     
+    /*
+		ESTADO: FUNCIONAL 
+		
+		DESCRIPCIÓN:
+			Cerrar ventana de chat y volver al login
+    */
     @FXML
-    void desconectarChat(MouseEvent event) {
+    void desconectar(MouseEvent event) {
     	cliente.desconectar();
     	
+    	// Crear controlador para vista de login
     	ControladorClienteLogin cdc = new ControladorClienteLogin(cliente);
     	
+    	// Cargar vista de login
     	URL rutaVistaDatosCliente = getClass().getResource("/view/VistaClienteLogin.fxml");
     	FXMLLoader vistaDatosClienteLoader = new FXMLLoader(rutaVistaDatosCliente);
     	
+    	// Asociar controlador a la vista
     	vistaDatosClienteLoader.setController(cdc);
     	
     	try {
@@ -230,19 +242,32 @@ public class ControladorClienteChat {
 	    	stage.show();
 		} catch (IOException e) {
 			System.out.println("---------------------------------------------------------------------");
-			e.printStackTrace();
+			//e.printStackTrace();
 			System.out.println("Error al cargar la ventana");
 			System.out.println("---------------------------------------------------------------------");
 		}
     }
     
     
+    /*
+		ESTADO: FUNCIONAL 
+		
+		DESCRIPCIÓN:
+			Manejador de envento para
+			botón enviar.
+    */
     @FXML
     void enviar_buttonFXClicked(MouseEvent event) {
     	enviarMensaje();
     }
     
     
+    /*
+		ESTADO: FUNCIONAL 
+		
+		DESCRIPCIÓN:
+			Enviar mensaje al servidor.
+    */
     public void enviarMensaje() {
     	if (cliente.getEstado() == 1) {
     		try {
@@ -260,9 +285,10 @@ public class ControladorClienteChat {
 	                mensajes_ListView.scrollTo(mensajes_ListView.getItems().size() - 1);
 	            }
 	        } catch (IOException ex) {
-	        	String errorMsg = "Error al enviar";
+	        	String errorMsg = "Error al enviar mensaje";
+
 	        	System.out.println("---------------------------------------------------------------------");
-				ex.printStackTrace();
+				// ex.printStackTrace();
 				System.out.println(errorMsg);
 				System.out.println("---------------------------------------------------------------------");
 				

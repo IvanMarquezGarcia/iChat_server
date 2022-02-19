@@ -1,5 +1,23 @@
-package controller;
+/*
+	Hecho por:
+		Eloy Guillermo Villadóniga Márquez
+		e
+		Iván Márquez García
 
+	2° D.A.M.
+
+	Práctica "Chat Colectivo" - Programación de Servicios y Procesos
+
+
+
+	------------------------------- DESCRIPCIÓN -------------------------------
+
+	Controlador de la vista VistaClienteLogin.fxml.
+*/
+
+
+
+package controller;
 
 
 
@@ -27,7 +45,6 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import model.Cliente;
-
 
 
 
@@ -82,13 +99,47 @@ public class ControladorClienteLogin {
     
     @FXML
     private Text error_text;
+
+    
+    @FXML
+	public void initialize() {
+		// Hacer que la ventana se pueda mover
+		root.setOnMousePressed(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                xOffset = ((Stage) root.getScene().getWindow()).getX() - event.getScreenX();
+                yOffset = ((Stage) root.getScene().getWindow()).getY() - event.getScreenY();
+            }
+        });
+		
+		root.setOnMouseDragged(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+            	((Stage) root.getScene().getWindow()).setX(event.getScreenX() + xOffset);
+            	((Stage) root.getScene().getWindow()).setY(event.getScreenY() + yOffset);
+            }
+        });
+	}
     
 
+    /*
+		ESTADO: FUNCIONAL 
+		
+		DESCRIPCIÓN:
+			Cerrar aplicación. 
+	*/
     @FXML
     void cerrar(MouseEvent event) {
     	System.exit(0);
     }
 
+    
+    /*
+		ESTADO: FUNCIONAL 
+		
+		DESCRIPCIÓN:
+			Conectar con el servidor. 
+	*/
     @FXML
     void conectar(MouseEvent event) {
     	error_text.setVisible(false);
@@ -96,6 +147,7 @@ public class ControladorClienteLogin {
     	String nombre = nombreDatos_textField.getText().trim();
     	String puertoString = puertoDatos_textField.getText().trim();
     	
+    	// Comprobar valor de los campos necesarios
     	if (nombre.length() > 0 && puertoString.length() > 0) {
 	    	String host = hostDatos_textField.getText().trim();
 	    	
@@ -105,6 +157,8 @@ public class ControladorClienteLogin {
 	    	try {
 	    		int puerto = Integer.parseInt(puertoString);
 	    		
+	    		// Comprobar que el puerto indicado
+	    		// es un puerto registrado
 	    		if (puerto > 1024 && puerto < 49151) {
 					Socket s = new Socket(host, puerto);
 					
@@ -114,14 +168,19 @@ public class ControladorClienteLogin {
 			    	System.out.println("-------" + nombre + "-------");
 			    	
 			    	if (cliente.conectar() == 1) {
+			    		// esto es sólo para que el error_text
+			    		// del cliente no sea nulo al iniciarlo
+			    		// en la ventana del chat
 			    		cliente.setError_text(error_text);
 			    		
-				        // Abrir ventana de chat
+				        // Cargar vista de chat
 				        URL rutaVistaCliente = getClass().getResource("/view/VistaClienteChat.fxml");
 				    	FXMLLoader vistaClienteLoader = new FXMLLoader(rutaVistaCliente);
 				    	
+				    	// Crear controlador para vista de chat
 				    	ControladorClienteChat cc = new ControladorClienteChat(cliente);
 				    	
+				    	// Asociar controlador a la vista
 				    	vistaClienteLoader.setController(cc);
 				    	
 						try {
@@ -132,13 +191,13 @@ public class ControladorClienteLogin {
 					        Stage stage = (Stage) source.getScene().getWindow();
 					        stage.close();
 							
-					        // Abrir ventana de chat cliente
+					        // Abrir ventana de chat
 							stage.setTitle("Cliente de eiChat | " + cliente.getNombre());
 							stage.setScene(scene);
 					    	stage.show();
 						} catch (IOException e) {
 							System.out.println("---------------------------------------------------------------------");
-							e.printStackTrace();
+							//e.printStackTrace();
 							System.out.println("Error al cargar la ventana");
 							System.out.println("---------------------------------------------------------------------");
 						}
@@ -158,7 +217,7 @@ public class ControladorClienteLogin {
 	    		String errorMsg = "Host desconocido";
 	    		
 	    		System.out.println("---------------------------------------------------------------------");
-	    		uhe.printStackTrace();
+	    		//uhe.printStackTrace();
 	    		System.out.println(errorMsg);
 				System.out.println("---------------------------------------------------------------------");
 				
@@ -169,7 +228,7 @@ public class ControladorClienteLogin {
 	    		String errorMsg = "Error al conectar";
 	    		
 	    		System.out.println("---------------------------------------------------------------------");
-	    		ce.printStackTrace();
+	    		//ce.printStackTrace();
 	    		System.out.println(errorMsg);
 				System.out.println("---------------------------------------------------------------------");
 				
@@ -180,7 +239,7 @@ public class ControladorClienteLogin {
 				String errorMsg = "Puerto no válido";
 	    		
 				System.out.println("---------------------------------------------------------------------");
-				nfe.printStackTrace();
+				//nfe.printStackTrace();
 				System.out.println(errorMsg);
 				System.out.println("---------------------------------------------------------------------");
 				
@@ -193,7 +252,7 @@ public class ControladorClienteLogin {
 	    		String errorMsg = "Error de E/S";
 	    		
 	    		System.out.println("---------------------------------------------------------------------");
-	    		ioe.printStackTrace();
+	    		//ioe.printStackTrace();
 				System.out.println(errorMsg);
 				System.out.println("---------------------------------------------------------------------");
 				
@@ -208,24 +267,5 @@ public class ControladorClienteLogin {
     		error_text.setVisible(true);
     	}
     }
-    
-    @FXML
-	public void initialize() {
-		root.setOnMousePressed(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                xOffset = ((Stage) root.getScene().getWindow()).getX() - event.getScreenX();
-                yOffset = ((Stage) root.getScene().getWindow()).getY() - event.getScreenY();
-            }
-        });
-		
-		root.setOnMouseDragged(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-            	((Stage) root.getScene().getWindow()).setX(event.getScreenX() + xOffset);
-            	((Stage) root.getScene().getWindow()).setY(event.getScreenY() + yOffset);
-            }
-        });
-	}
     
 }
