@@ -158,7 +158,7 @@ public class HiloServidor implements Runnable {
 
 		} catch (IOException ex) {
 			System.out.println("-----------------------------------------------------------");
-			//ex.printStackTrace();
+			ex.printStackTrace();
 			System.out.println("Error al enviar el mensaje al cliente");
 			System.out.println("-----------------------------------------------------------");
 		}

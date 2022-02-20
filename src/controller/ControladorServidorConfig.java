@@ -165,7 +165,7 @@ public class ControladorServidorConfig {
     	    		    	stage.show();
     	    			} catch (IOException e) {
     	    				System.out.println("---------------------------------------------------------------------");
-    	    				// e.printStackTrace();
+    	    				e.printStackTrace();
     	    				System.out.println("Error al cargar la ventana");
     	    				System.out.println("---------------------------------------------------------------------");
     	    			}

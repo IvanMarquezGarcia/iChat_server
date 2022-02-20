@@ -238,7 +238,8 @@ public class Servidor {
 							// Informar al resto de clientes conectados
 							Platform.runLater(() -> {
 								mensajeParaTodos("\t\t>> " + c.getNombre() + " se ha conectado <<", hls);
-								textArea.appendText("[" + new Date() + "] | [HOST: " + c.getSocket().getInetAddress().getHostAddress() + " PORT: " + c.getSocket().getPort() + "] - " + c.getNombre() + " se ha conectado\n");
+								textArea.appendText("[" + new Date() + "] | [HOST: " + c.getSocket().getInetAddress().getHostAddress() +
+													" PORT: " + c.getSocket().getPort() + "] - " + c.getNombre() + " se ha conectado\n");
 							});
 							
 							// Crear y ejecutar un nuevo hilo para la comunicación con el cliente

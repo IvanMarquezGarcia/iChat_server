@@ -34,12 +34,12 @@
             </HBox>
             <HBox alignment="CENTER_RIGHT" spacing="10.0">
                <children>
-                  <ImageView fx:id="desconectar_ImageView" fitHeight="33.0" fitWidth="30.0" onMouseClicked="#desconectarChat" pickOnBounds="true" preserveRatio="true">
+                  <ImageView fx:id="desconectar_ImageView" fitHeight="33.0" fitWidth="30.0" onMouseClicked="#desconectar" pickOnBounds="true" preserveRatio="true">
                      <image>
                         <Image url="@../../res/images/logout.png" />
                      </image>
                   </ImageView>
-                  <ImageView fx:id="cerrar_ImageView1" fitHeight="33.0" fitWidth="30.0" onMouseClicked="#cerrarChat" pickOnBounds="true" preserveRatio="true">
+                  <ImageView fx:id="cerrar_ImageView1" fitHeight="33.0" fitWidth="30.0" onMouseClicked="#cerrar" pickOnBounds="true" preserveRatio="true">
                      <image>
                         <Image url="@../../res/images/close.png" />
                      </image>
