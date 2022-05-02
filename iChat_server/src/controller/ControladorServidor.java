@@ -26,8 +26,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 
 import javafx.scene.control.Button;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.ListView;
 
 import javafx.scene.image.ImageView;
 
@@ -38,7 +37,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 import javafx.stage.Stage;
-
+import model.MensajeCellFactory;
 import model.Servidor;
 
 
@@ -77,10 +76,7 @@ public class ControladorServidor {
 	private Text info_Text;
 
 	@FXML
-	private ScrollPane mensajes_scrollPane;
-
-	@FXML
-	private TextArea mensajes_textArea;
+	private ListView<String> mensajes_ListView;
 
 	@FXML
 	private VBox root;
@@ -88,7 +84,7 @@ public class ControladorServidor {
 
 	@FXML
 	public void initialize() {	    	
-		this.servidor.setTextArea(mensajes_textArea);
+		this.servidor.setListView(mensajes_ListView);
 		this.infoPuerto_Text.setText("Puerto: " + servidor.getPort());
 		this.infoDir_Text.setText("Host: " + servidor.getHost());
 		
@@ -107,6 +103,9 @@ public class ControladorServidor {
             	((Stage) root.getScene().getWindow()).setY(event.getScreenY() + yOffset);
             }
         });
+		
+		MensajeCellFactory mcf = new MensajeCellFactory();
+		servidor.listView.setCellFactory(mcf);
 	}
 
 	

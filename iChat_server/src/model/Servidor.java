@@ -39,9 +39,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import javafx.application.Platform;
-
-import javafx.scene.control.TextArea;
-
+import javafx.scene.control.ListView;
 
 
 public class Servidor {
@@ -52,7 +50,7 @@ public class Servidor {
 	private ServerSocket serverSocket;
 	private boolean conectado;
 	private int numMaxConx;
-	public TextArea textArea;
+	public ListView<String> listView;
 	private ArrayList<HiloServidor> listaConexiones = new ArrayList<HiloServidor>(0);
 
 
@@ -74,7 +72,7 @@ public class Servidor {
 
 	public boolean isConectado() { return conectado; }
 
-	public void setTextArea(TextArea txt) { this.textArea = txt; }
+	public void setListView(ListView<String> txt) { this.listView = txt; }
 
 	public ArrayList<HiloServidor> getConexiones() { return listaConexiones; }
 
@@ -135,7 +133,8 @@ public class Servidor {
 					serverSocket.close();
 					serverSocket = null;
 					
-					textArea.appendText("[" + new Date() + "] | [HOST: " + host + " PORT: " + port + "] - Servidor desconectado\n");
+					listView.getItems().add("[" + new Date() + "] | [HOST: " + host + " PORT: " + port + "] - Servidor desconectado\n");
+					listView.scrollTo(listView.getItems().size() - 1);
 				}
 			} catch (IOException e) {
 				System.out.println("-----------------------------------------------------------");
@@ -194,7 +193,7 @@ public class Servidor {
 
 				// Indicar en el área de texto que el servidor se ha iniciado
 				Platform.runLater(() ->
-					textArea.appendText("[" + new Date() + "] | [HOST: " + serverSocket.getInetAddress().getHostAddress() + " PORT: " + serverSocket.getLocalPort() + "] - Servidor iniciado\n"
+					listView.getItems().add("[" + new Date() + "] | [HOST: " + serverSocket.getInetAddress().getHostAddress() + " PORT: " + serverSocket.getLocalPort() + "] - Servidor iniciado\n"
 				));
 
 				while (conectado == true) {
@@ -238,7 +237,7 @@ public class Servidor {
 							// Informar al resto de clientes conectados
 							Platform.runLater(() -> {
 								mensajeParaTodos("\t\t>> " + c.getNombre() + " se ha conectado <<", hls);
-								textArea.appendText("[" + new Date() + "] | [HOST: " + c.getSocket().getInetAddress().getHostAddress() +
+								listView.getItems().add("[" + new Date() + "] | [HOST: " + c.getSocket().getInetAddress().getHostAddress() +
 													" PORT: " + c.getSocket().getPort() + "] - " + c.getNombre() + " se ha conectado\n");
 							});
 							

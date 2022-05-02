@@ -53,7 +53,7 @@
       </HBox>
       <ListView fx:id="mensajes_ListView" focusTraversable="false" minWidth="502.0" prefHeight="484.0" prefWidth="502.0" style="-fx-background-color: #505050;" VBox.vgrow="ALWAYS">
          <VBox.margin>
-            <Insets left="12.0" right="16.0" />
+            <Insets left="16.0" right="16.0" />
          </VBox.margin>
       </ListView>
       <Text fx:id="error_text" fill="#ff4444" strokeType="OUTSIDE" strokeWidth="0.0" text="Error de conexión" visible="false">

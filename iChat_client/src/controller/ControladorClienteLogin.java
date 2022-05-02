@@ -184,7 +184,7 @@ public class ControladorClienteLogin {
 				    	vistaClienteLoader.setController(cc);
 				    	
 						try {
-							Scene scene = new Scene(vistaClienteLoader.load(), 530, 600);
+							Scene scene = new Scene(vistaClienteLoader.load());
 							
 							// Cerrar ventana de login
 					    	Node source = (Node) event.getSource();

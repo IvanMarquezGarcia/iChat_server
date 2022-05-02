@@ -95,8 +95,9 @@ public class HiloServidor implements Runnable {
 					
 					// Informar al resto de clientes conectados
 					Platform.runLater(() -> {
-						servidor.textArea.appendText(	"[" + new Date() + "] | [HOST: " + host + " PORT: " + port + "] - " +
+						servidor.listView.getItems().add("[" + new Date() + "] | [HOST: " + host + " PORT: " + port + "] - " +
 														cliente.getNombre() + " se ha desconectado\n");
+						servidor.listView.scrollTo(servidor.listView.getItems().size() - 1);
 						servidor.mensajeParaTodos("\t\t>> " + cliente.getNombre() + " se ha desconectado <<", this);
 					});
 					
@@ -109,7 +110,8 @@ public class HiloServidor implements Runnable {
 	
 					// Mostrar mensaje en el área de texto
 					Platform.runLater(() -> {                    
-						servidor.textArea.appendText(mensaje + "\n");
+						servidor.listView.getItems().add(mensaje + "\n");
+						servidor.listView.scrollTo(servidor.listView.getItems().size() - 1);
 					});
 				}
 			}
