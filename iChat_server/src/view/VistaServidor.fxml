@@ -21,7 +21,7 @@
             </Text>
             <ImageView fx:id="cerrar_ImageView" fitHeight="33.0" fitWidth="20.0" onMouseClicked="#cerrar" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@../../res/images/close.png" />
+                  <Image url="/res/images/close.png" />
                </image>
                <HBox.margin>
                   <Insets right="10.0" />
