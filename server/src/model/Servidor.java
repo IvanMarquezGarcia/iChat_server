@@ -1,21 +1,21 @@
 /*
 	Hecho por:
-		Eloy Guillermo Villadóniga Márquez
+		Eloy Guillermo Villadï¿½niga Mï¿½rquez
 		e
-		Iván Márquez García
+		Ivï¿½n Mï¿½rquez Garcï¿½a
 
-	2° D.A.M.
+	2ï¿½ D.A.M.
 
-	Práctica "Chat Colectivo" - Programación de Servicios y Procesos
+	Prï¿½ctica "Chat Colectivo" - Programaciï¿½n de Servicios y Procesos
 
 
 
-	------------------------------- DESCRIPCIÓN -------------------------------
+	------------------------------- DESCRIPCIï¿½N -------------------------------
 
-	Esta es la clase que actúa como servidor. Tiene una lista donde almacena
+	Esta es la clase que actï¿½a como servidor. Tiene una lista donde almacena
 	todas las conexiones funcionales con los clientes conectados.
 	
-	Su función es aceptar peticiones continuamente en función del máximo permitido.
+	Su funciï¿½n es aceptar peticiones continuamente en funciï¿½n del mï¿½ximo permitido.
 	
 	Cuando un cliente se conecta, crea un hilo usando una instancia de
 	HiloServidor y lo ejecuta para que este se encargue de las tareas vinculadas
@@ -28,6 +28,7 @@ package model;
 
 
 
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -35,10 +36,19 @@ import java.io.ObjectInputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import java.sql.Connection;
+import java.sql.Statement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+
+import utils.databases.Mysql;
 
 import javafx.application.Platform;
+
 import javafx.scene.control.ListView;
 
 
@@ -82,15 +92,15 @@ public class Servidor {
 	/*
 		ESTADO: FUNCIONAL 
 		
-		DESCRIPCIÓN:
+		DESCRIPCIï¿½N:
 			Enviar mensaje a todos los clientes excepto
 			al que sea igual que el indicado como segundo
-			parámetro.
+			parï¿½metro.
 		
-		PARÁMETROS:
+		PARï¿½METROS:
 			+ String que representa el mensaje a enviar.
 			+ HiloServidor que representa el hilo del
-				servidor que envía el mensaje.
+				servidor que envï¿½a el mensaje.
 	*/
 	public void mensajeParaTodos(String mensaje, HiloServidor hlsEmisor) {
 		if (hlsEmisor == null) { // enviar a todos
@@ -111,7 +121,7 @@ public class Servidor {
 	/*
 		ESTADO: FUNCIONAL 
 		
-		DESCRIPCIÓN:
+		DESCRIPCIï¿½N:
 			Indicar a todos los clientes que el servidor
 			se va a desconectar y cerrar socket del servidor.
 	*/
@@ -119,7 +129,7 @@ public class Servidor {
 		if (conectado == true) {
 			conectado = false;
 			
-			// Indicar a todos los clientes la desconexión del servidor
+			// Indicar a todos los clientes la desconexiï¿½n del servidor
 			mensajeParaTodos("|/\\\\/\\//\\|", null);
 			
 			//limpiarConexiones();
@@ -149,13 +159,13 @@ public class Servidor {
 	/*
 		ESTADO: FUNCIONAL 
 		
-		DESCRIPCIÓN:
+		DESCRIPCIï¿½N:
 			Elimina de la lista de conexiones aquellas
-			conexiones que no sean válidas (nulas, cerradas...).
+			conexiones que no sean vï¿½lidas (nulas, cerradas...).
 	*/
 	public void limpiarConexiones() {
 		System.out.println("------------------------------------------------------------");
-		System.out.println("número de conexiones antes de limpiar " + listaConexiones.size());
+		System.out.println("nï¿½mero de conexiones antes de limpiar " + listaConexiones.size());
 
 		for (int i = 0; i < listaConexiones.size(); i++) {
 			if (listaConexiones.get(i).getCliente().getSocket().isClosed()) {
@@ -171,7 +181,7 @@ public class Servidor {
 			}
 		}
 
-		System.out.println("número de conexiones despues de limpiar " + listaConexiones.size());
+		System.out.println("nï¿½mero de conexiones despues de limpiar " + listaConexiones.size());
 		System.out.println("------------------------------------------------------------");
 	}
 
@@ -179,7 +189,7 @@ public class Servidor {
 	/*
 		ESTADO: FUNCIONAL 
 		
-		DESCRIPCIÓN:
+		DESCRIPCIï¿½N:
 			Arranca el servidor.
 	*/
 	public void arrancar() {
@@ -191,7 +201,7 @@ public class Servidor {
 				// Crear ServerSocket
 				serverSocket = new ServerSocket(PORT);
 
-				// Indicar en el área de texto que el servidor se ha iniciado
+				// Indicar en el ï¿½rea de texto que el servidor se ha iniciado
 				Platform.runLater(() ->
 					listView.getItems().add("[" + new Date() + "] | [HOST: " + serverSocket.getInetAddress().getHostAddress() + " PORT: " + serverSocket.getLocalPort() + "] - Servidor iniciado\n"
 				));
@@ -200,20 +210,95 @@ public class Servidor {
 					synchronized(this) {
 						Socket socketNuevoCliente = null;
 						try {
-							// Escuchar petición de conexión
+							// Escuchar peticiï¿½n de conexiï¿½n
 							System.out.println("Escuchando con " + listaConexiones.size() + " clientes conectados");
 							socketNuevoCliente = serverSocket.accept();
 							System.out.println("Nuevo cliente solicita entrar");
 	
 							DataOutputStream output = new DataOutputStream(socketNuevoCliente.getOutputStream());
 	
-							// Si el servidor está lleno rechaza la conexión
+							// Si el servidor estï¿½ lleno rechaza la conexiï¿½n
 							if (numMaxConx != -1 && numMaxConx <= listaConexiones.size()) {
-								output.writeUTF("S_lleno_#no#mas#peticiones#_"); // String para indicar que servidor está lleno
+								output.writeUTF("S_lleno_#no#mas#peticiones#_"); // String para indicar que servidor estï¿½ lleno
 								socketNuevoCliente.close();
 							}
-							else // Si no, acepta la conexión
-								output.writeUTF("aceptado");
+							else { // Si no, comprueba bd para aceptar la conexiÃ³n
+								Socket socket = socketNuevoCliente; // para respetar reglas lambda
+								new Thread(() -> {
+									try {
+										DataInputStream input = new DataInputStream(socket.getInputStream());
+										
+										String strData = input.readUTF();
+									    
+									    String[] aux = strData.split(", ");
+									    HashMap<String, String> data = new HashMap<String, String>();
+									    
+									    for (String s : aux) {
+									    	String[] pair = s.split("=");
+									    	System.out.println(s);
+									    	data.put(pair[0], pair[1]);
+									    }
+									    
+										Connection connection = Mysql.connect("127.0.0.1", "root", "root");
+										
+										if (connection != null) {
+											Statement s = connection.createStatement();
+											
+											ResultSet rs = s.executeQuery("SELECT username, password FROM user WHERE username = '" + data.get("username") + "'");
+											
+											if (rs.next()) {
+												if (rs.getString(2).equals(data.get("password")))
+													output.writeUTF("aceptado");
+												else
+													output.writeUTF("ContraseÃ±a incorrecta");
+											}
+											else
+												output.writeUTF("Â¡Ups!, parece que no estÃ¡s registrado");
+										}
+										else
+											output.writeUTF("No es posible conectar con la base de datos");
+										
+										// Si el socket del nuevo cliente es vÃ¡lido
+										if (socket != null && socket.isClosed() == false) {
+											// Recontruir cliente recibido
+											ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
+											Cliente c = (Cliente) ois.readObject();
+											c.setSocket(socket);
+											c.setOutput(new DataOutputStream(c.getSocket().getOutputStream()));
+											
+											// Aï¿½adir la nueva conexiï¿½n a la lista de conexiones
+											HiloServidor hls = new HiloServidor(c, this);
+											listaConexiones.add(hls);
+											
+											// Informar al resto de clientes conectados
+											Platform.runLater(() -> {
+												mensajeParaTodos("\t\t>> " + c.getNombre() + " se ha conectado <<", hls);
+												listView.getItems().add("[" + new Date() + "] | [HOST: " + c.getSocket().getInetAddress().getHostAddress() +
+																	" PORT: " + c.getSocket().getPort() + "] - " + c.getNombre() + " se ha conectado\n");
+											});
+											
+											// Crear y ejecutar un nuevo hilo para la comunicaciï¿½n con el cliente
+											Thread thread = new Thread(hls);
+											thread.start();
+										}
+									}
+									catch (ClassNotFoundException cnfe) {
+										System.out.println("-----------------------------------------------------------");
+										//cnfe.printStackTrace();
+										System.out.println("Error al encontrar la clase < Cliente >");
+										System.out.println("-----------------------------------------------------------");
+									}
+									catch(SQLException sqle) {
+										sqle.printStackTrace();
+									}
+									catch(IOException ioe) {
+										ioe.printStackTrace();
+									}
+									catch (Exception e) {
+										e.printStackTrace();
+									}
+								}).start();
+							}
 						}
 						catch(IOException e) {
 							System.out.println("-----------------------------------------------------------");
@@ -221,38 +306,8 @@ public class Servidor {
 							System.out.println("La escucha del servidor se ha interrumpido.");
 							System.out.println("-----------------------------------------------------------");
 						}
-	
-						// Si el socket del nuevo cliente es válido
-						if (socketNuevoCliente != null && socketNuevoCliente.isClosed() == false) {
-							// Recontruir cliente recibido
-							ObjectInputStream ois = new ObjectInputStream(socketNuevoCliente.getInputStream()); 
-							Cliente c = (Cliente) ois.readObject();
-							c.setSocket(socketNuevoCliente);
-							c.setOutput(new DataOutputStream(c.getSocket().getOutputStream()));
-							
-							// Añadir la nueva conexión a la lista de conexiones
-							HiloServidor hls = new HiloServidor(c, this);
-							listaConexiones.add(hls);
-							
-							// Informar al resto de clientes conectados
-							Platform.runLater(() -> {
-								mensajeParaTodos("\t\t>> " + c.getNombre() + " se ha conectado <<", hls);
-								listView.getItems().add("[" + new Date() + "] | [HOST: " + c.getSocket().getInetAddress().getHostAddress() +
-													" PORT: " + c.getSocket().getPort() + "] - " + c.getNombre() + " se ha conectado\n");
-							});
-							
-							// Crear y ejecutar un nuevo hilo para la comunicación con el cliente
-							Thread thread = new Thread(hls);
-							thread.start();
-						}
 					}
 				}
-			}
-			catch (ClassNotFoundException cnfe) {
-				System.out.println("-----------------------------------------------------------");
-				//cnfe.printStackTrace();
-				System.out.println("Error al encontrar la clase < Cliente >");
-				System.out.println("-----------------------------------------------------------");
 			}
 			catch (IOException ex) {
 				System.out.println("-----------------------------------------------------------");

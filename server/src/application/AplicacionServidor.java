@@ -1,8 +1,5 @@
 /*
-	Hecho por:
-		Eloy Guillermo Villadóniga Márquez
-		e
-		Iván Márquez García
+	Hecho por: Iván Márquez García
 		
 	2° D.A.M.
 	
