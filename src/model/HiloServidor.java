@@ -1,18 +1,18 @@
 /*
 	Hecho por:
-		Eloy Guillermo Villadóniga Márquez
+		Eloy Guillermo Villadï¿½niga Mï¿½rquez
 		e
-		Iván Márquez García
+		Ivï¿½n Mï¿½rquez Garcï¿½a
 
-	2° D.A.M.
+	2ï¿½ D.A.M.
 
-	Práctica "Chat Colectivo" - Programación de Servicios y Procesos
+	Prï¿½ctica "Chat Colectivo" - Programaciï¿½n de Servicios y Procesos
 
 
 
-	------------------------------- DESCRIPCIÓN -------------------------------
+	------------------------------- DESCRIPCIï¿½N -------------------------------
 
-	Representa un hilo que se encarga de las tareas de una conexión entre el
+	Representa un hilo que se encarga de las tareas de una conexiï¿½n entre el
 	servidor y un cliente.
  */
 
@@ -25,7 +25,7 @@ package model;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-
+import java.net.Socket;
 import java.net.SocketException;
 
 import java.util.Date;
@@ -36,31 +36,33 @@ import javafx.application.Platform;
 
 public class HiloServidor implements Runnable {
 
-	private Cliente cliente;
 	private Servidor servidor;
 	private DataInputStream input;
 	private DataOutputStream output;
+	private Socket userSocket;
+	private String username;
 
 	
-	public HiloServidor(Cliente cliente, Servidor servidor) {
-		this.cliente = cliente;
+	public HiloServidor(String username, Socket s, Servidor servidor) {
+		this.username = username;
+		this.userSocket = s;
 		this.servidor = servidor;
 	}
 
 	
-	public Cliente getCliente() {
-		return cliente;
+	public Socket getUserSocket() {
+		return userSocket;
 	}
-
-	public void setCliente(Cliente cliente) {
-		this.cliente = cliente;
+	
+	public String getUsername() {
+		return username;
 	}
 
 	
 	/*
 		ESTADO: FUNCIONAL 
 		
-		DESCRIPCIÓN:
+		DESCRIPCIï¿½N:
 			Ejecuta la tarea de lectura de datos
 			servidor <- cliente de manera continua
 			he informa al resto de clientes.
@@ -69,21 +71,21 @@ public class HiloServidor implements Runnable {
 	public void run() {
 		try {
 			// Iniciar flujos de entrada y salida
-			input = new DataInputStream(cliente.getSocket().getInputStream());
-			output = new DataOutputStream(cliente.getSocket().getOutputStream());
+			input = new DataInputStream(userSocket.getInputStream());
+			output = new DataOutputStream(userSocket.getOutputStream());
 			
 			while (servidor.isConectado() == true) {
 				// Reciber mensaje de cliente
 				String mensaje = input.readUTF();
 
-				// String para indicar la desconexión del cliente asociado: |/\\\\/\\//\\|
-				if (mensaje.equals("|/\\\\/\\//\\|")) {
-					String host = cliente.getSocket().getInetAddress().getHostName();
-					int port = cliente.getSocket().getPort();
+				// user is going to disconnect
+				if (mensaje.equals("---//_/_#b#y#e#_!/_")) {
+					String host = userSocket.getInetAddress().getHostName();
+					int port = userSocket.getPort();
 					
-					cliente.getSocket().shutdownInput();
-					cliente.getSocket().shutdownOutput();
-					cliente.getSocket().close();
+					userSocket.shutdownInput();
+					userSocket.shutdownOutput();
+					userSocket.close();
 					
 					input.close();
 					input = null;
@@ -96,9 +98,9 @@ public class HiloServidor implements Runnable {
 					// Informar al resto de clientes conectados
 					Platform.runLater(() -> {
 						servidor.listView.getItems().add("[" + new Date() + "] | [HOST: " + host + " PORT: " + port + "] - " +
-														cliente.getNombre() + " se ha desconectado\n");
+														username + " se ha desconectado\n");
 						servidor.listView.scrollTo(servidor.listView.getItems().size() - 1);
-						servidor.mensajeParaTodos("\t\t>> " + cliente.getNombre() + " se ha desconectado <<", this);
+						servidor.mensajeParaTodos("\t\t>> " + username + " se ha desconectado <<", this);
 					});
 					
 					break;
@@ -108,7 +110,7 @@ public class HiloServidor implements Runnable {
 					if (output != null)
 						servidor.mensajeParaTodos(mensaje, this);
 	
-					// Mostrar mensaje en el área de texto
+					// Mostrar mensaje en el ï¿½rea de texto
 					Platform.runLater(() -> {                    
 						servidor.listView.getItems().add(mensaje + "\n");
 						servidor.listView.scrollTo(servidor.listView.getItems().size() - 1);
@@ -130,8 +132,8 @@ public class HiloServidor implements Runnable {
 		}
 		finally {
 			try {
-				if (cliente.getSocket().isClosed() == false)
-					cliente.getSocket().close();
+				if (userSocket.isClosed() == false)
+					userSocket.close();
 			}
 			catch (IOException ex) {
 				System.out.println("-----------------------------------------------------------");
@@ -146,17 +148,18 @@ public class HiloServidor implements Runnable {
 	/*
 		ESTADO: FUNCIONAL 
 		
-		DESCRIPCIÓN:
+		DESCRIPCIï¿½N:
 			Enviar mensaje al cliente asociado a este
 			hilo del servidor.
 		
-		PARÁMETROS:
+		PARï¿½METROS:
 		 + String que representa el mensaje a enviar
 	*/
 	public void mensajeExclusivo(String message) {
 		try {
-			cliente.getOutput().writeUTF(message);
-			cliente.getOutput().flush();
+			DataOutputStream output = new DataOutputStream(userSocket.getOutputStream());
+			output.writeUTF(message);
+			output.flush();
 
 		} catch (IOException ex) {
 			System.out.println("-----------------------------------------------------------");

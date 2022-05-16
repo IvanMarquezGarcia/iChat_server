@@ -1,12 +1,7 @@
 /*
-	Hecho por:
-		Eloy Guillermo Villad�niga M�rquez
-		e
-		Iv�n M�rquez Garc�a
+	Hecho por: Iván Márquez García
 
-	2� D.A.M.
-
-	Pr�ctica "Chat Colectivo" - Programaci�n de Servicios y Procesos
+	2° D.A.M.
 
 
 
@@ -27,29 +22,24 @@
 package model;
 
 
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 
 import java.net.ServerSocket;
 import java.net.Socket;
 
 import java.sql.Connection;
-import java.sql.Statement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
-import utils.databases.Mysql;
-
 import javafx.application.Platform;
 
 import javafx.scene.control.ListView;
+
+import utils.databases.Mysql;
 
 
 public class Servidor {
@@ -105,13 +95,13 @@ public class Servidor {
 	public void mensajeParaTodos(String mensaje, HiloServidor hlsEmisor) {
 		if (hlsEmisor == null) { // enviar a todos
 			for (HiloServidor hls : this.listaConexiones) {
-				if (hls.getCliente().getSocket() != null)
+				if (hls.getUserSocket() != null)
 					hls.mensajeExclusivo(mensaje);
 			}
 		}
 		else { // enviar a todos excepto al que sea igual que hlsEmisor
 			for (HiloServidor hls : this.listaConexiones) {
-				if (hls.getCliente().getSocket() != null && hls.equals(hlsEmisor) == false)
+				if (hls.getUserSocket() != null && hls.equals(hlsEmisor) == false)
 					hls.mensajeExclusivo(mensaje);
 			}
 		}
@@ -130,9 +120,7 @@ public class Servidor {
 			conectado = false;
 			
 			// Indicar a todos los clientes la desconexi�n del servidor
-			mensajeParaTodos("|/\\\\/\\//\\|", null);
-			
-			//limpiarConexiones();
+			mensajeParaTodos("------//_/_#s#b#y#e#s#_!/_", null);
 
 			try {
 				// Cerrar ServerSocket
@@ -168,8 +156,8 @@ public class Servidor {
 		System.out.println("n�mero de conexiones antes de limpiar " + listaConexiones.size());
 
 		for (int i = 0; i < listaConexiones.size(); i++) {
-			if (listaConexiones.get(i).getCliente().getSocket().isClosed()) {
-				System.out.println("\t-" + listaConexiones.get(i).getCliente().getNombre() + " eliminado");
+			if (listaConexiones.get(i).getUserSocket().isClosed()) {
+				System.out.println("\t-" + listaConexiones.get(i).getUsername() + " eliminado");
 				listaConexiones.remove(i);
 			}
 		}
@@ -177,7 +165,7 @@ public class Servidor {
 		if (listaConexiones.size() > 0) {
 			System.out.println("\n");
 			for (int i = 0; i < listaConexiones.size(); i++) {
-				System.out.println("\t-" + listaConexiones.get(i).getCliente().getNombre() + " conectado");
+				System.out.println("\t-" + listaConexiones.get(i).getUsername() + " conectado");
 			}
 		}
 
@@ -219,7 +207,7 @@ public class Servidor {
 	
 							// Si el servidor est� lleno rechaza la conexi�n
 							if (numMaxConx != -1 && numMaxConx <= listaConexiones.size()) {
-								output.writeUTF("S_lleno_#no#mas#peticiones#_"); // String para indicar que servidor est� lleno
+								output.writeUTF("------/n##em/p#t_y_");
 								socketNuevoCliente.close();
 							}
 							else { // Si no, comprueba bd para aceptar la conexión
@@ -242,54 +230,36 @@ public class Servidor {
 										Connection connection = Mysql.connect("127.0.0.1", "root", "root");
 										
 										if (connection != null) {
-											Statement s = connection.createStatement();
-											
-											ResultSet rs = s.executeQuery("SELECT username, password FROM user WHERE username = '" + data.get("username") + "'");
-											
-											if (rs.next()) {
-												if (rs.getString(2).equals(data.get("password")))
-													output.writeUTF("aceptado");
-												else
-													output.writeUTF("Contraseña incorrecta");
-											}
-											else
-												output.writeUTF("¡Ups!, parece que no estás registrado");
+											String response = "------e#rr//_";
+											if (data.get("type").equals("login"))
+												response = Mysql.login(connection, data);
+											else if (data.get("type").equals("logup"))
+												response = Mysql.logup(connection, data);
+											output.writeUTF(response);
 										}
 										else
-											output.writeUTF("No es posible conectar con la base de datos");
+											output.writeUTF("------db/#una/b_#le_");
+										
+										if (data.get("type").equals("logup"))
+											socket.close();
 										
 										// Si el socket del nuevo cliente es válido
-										if (socket != null && socket.isClosed() == false) {
-											// Recontruir cliente recibido
-											ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
-											Cliente c = (Cliente) ois.readObject();
-											c.setSocket(socket);
-											c.setOutput(new DataOutputStream(c.getSocket().getOutputStream()));
-											
-											// A�adir la nueva conexi�n a la lista de conexiones
-											HiloServidor hls = new HiloServidor(c, this);
+										if (socket != null && socket.isClosed() == false) {											
+											// Add new connection to connections list
+											HiloServidor hls = new HiloServidor(data.get("username"), socket, this);
 											listaConexiones.add(hls);
 											
 											// Informar al resto de clientes conectados
 											Platform.runLater(() -> {
-												mensajeParaTodos("\t\t>> " + c.getNombre() + " se ha conectado <<", hls);
-												listView.getItems().add("[" + new Date() + "] | [HOST: " + c.getSocket().getInetAddress().getHostAddress() +
-																	" PORT: " + c.getSocket().getPort() + "] - " + c.getNombre() + " se ha conectado\n");
+												mensajeParaTodos("\t\t>> " + hls.getUsername() + " se ha conectado <<", hls);
+												listView.getItems().add("[" + new Date() + "] | [HOST: " + hls.getUserSocket().getInetAddress().getHostAddress() +
+																	" PORT: " + hls.getUserSocket().getPort() + "] - " + hls.getUsername() + " se ha conectado\n");
 											});
 											
 											// Crear y ejecutar un nuevo hilo para la comunicaci�n con el cliente
 											Thread thread = new Thread(hls);
 											thread.start();
 										}
-									}
-									catch (ClassNotFoundException cnfe) {
-										System.out.println("-----------------------------------------------------------");
-										//cnfe.printStackTrace();
-										System.out.println("Error al encontrar la clase < Cliente >");
-										System.out.println("-----------------------------------------------------------");
-									}
-									catch(SQLException sqle) {
-										sqle.printStackTrace();
 									}
 									catch(IOException ioe) {
 										ioe.printStackTrace();
