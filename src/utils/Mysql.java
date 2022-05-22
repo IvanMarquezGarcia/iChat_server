@@ -1,4 +1,5 @@
-package utils.databases;
+package utils;
+
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -7,7 +8,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 
-public class Mysql {	
+import static utils.Constants.*;
+
+
+public class Mysql {
 
 	// Conectar con base de datos MySQL
 	public static Connection connect(String host, String user, String password) {
@@ -23,7 +27,7 @@ public class Mysql {
 		return c;
 	}
 
-	
+
 	// Cerrar conexión
 	public static void disconnect(Connection c) {
 		try {
@@ -40,8 +44,8 @@ public class Mysql {
 			System.out.println("Conexión inválida");
 		}
 	}
-	
-	
+
+
 	public static String login(Connection c, HashMap<String, String> data) {
 		String query = "SELECT username, password FROM user WHERE username = ?";
 		try {
@@ -50,32 +54,32 @@ public class Mysql {
 			ResultSet rs = ps.executeQuery();
 			if (rs.next()) {
 				if (rs.getString(2).equals(data.get("password")))
-					return "------#//u_o/k_#";
+					return RESPONSE_OK;
 				else
-					return "------***#pass/*word**#";
+					return RESPONSE_INCORRECT_PASSWORD;
 			}
 			else
-				return "------un##/r//_/_";
+				return RESPONSE_UNREGISTERED;
 		} catch (SQLException e) {
 			e.printStackTrace();
-			return "------e#rr//_";
+			return RESPONSE_ERROR;
 		}
 	}
-	
-	
+
+
 	public static String logup(Connection c, HashMap<String, String> data) {
 		try {
-			String instert = "INSERT INTO user (username, password, language) VALUES (?, ?, ?)";
-			PreparedStatement ps = c.prepareStatement(instert);
+			String insert = "INSERT INTO user (username, password, language) VALUES (?, ?, ?)";
+			PreparedStatement ps = c.prepareStatement(insert);
 			ps.setString(1, data.get("username"));
 			ps.setString(2, data.get("password"));
 			ps.setString(3, data.get("language"));
 			if (ps.executeUpdate() >= 0)
-				return "------#//u_o/k_#";
+				return RESPONSE_OK;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return "------e#rr//_";
+		return RESPONSE_ERROR;
 	}
-	
+
 }

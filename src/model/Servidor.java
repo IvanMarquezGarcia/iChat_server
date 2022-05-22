@@ -38,8 +38,9 @@ import java.util.HashMap;
 import javafx.application.Platform;
 
 import javafx.scene.control.ListView;
+import utils.Mysql;
 
-import utils.databases.Mysql;
+import static utils.Constants.*;
 
 
 public class Servidor {
@@ -120,7 +121,7 @@ public class Servidor {
 			conectado = false;
 			
 			// Indicar a todos los clientes la desconexi�n del servidor
-			mensajeParaTodos("------//_/_#s#b#y#e#s#_!/_", null);
+			mensajeParaTodos(SERVER_DISCONNECTION, null);
 
 			try {
 				// Cerrar ServerSocket
@@ -207,7 +208,7 @@ public class Servidor {
 	
 							// Si el servidor est� lleno rechaza la conexi�n
 							if (numMaxConx != -1 && numMaxConx <= listaConexiones.size()) {
-								output.writeUTF("------/n##em/p#t_y_");
+								output.writeUTF(RESPONSE_SERVER_FULL);
 								socketNuevoCliente.close();
 							}
 							else { // Si no, comprueba bd para aceptar la conexión
@@ -230,7 +231,7 @@ public class Servidor {
 										Connection connection = Mysql.connect("127.0.0.1", "root", "root");
 										
 										if (connection != null) {
-											String response = "------e#rr//_";
+											String response = RESPONSE_ERROR;
 											if (data.get("type").equals("login"))
 												response = Mysql.login(connection, data);
 											else if (data.get("type").equals("logup"))
@@ -238,7 +239,7 @@ public class Servidor {
 											output.writeUTF(response);
 										}
 										else
-											output.writeUTF("------db/#una/b_#le_");
+											output.writeUTF(RESPONSE_DB_UNABLE_CONNECTION);
 										
 										if (data.get("type").equals("logup"))
 											socket.close();

@@ -32,6 +32,8 @@ import java.util.Date;
 
 import javafx.application.Platform;
 
+import static utils.Constants.*;
+
 
 
 public class HiloServidor implements Runnable {
@@ -79,7 +81,7 @@ public class HiloServidor implements Runnable {
 				String mensaje = input.readUTF();
 
 				// user is going to disconnect
-				if (mensaje.equals("---//_/_#b#y#e#_!/_")) {
+				if (mensaje.equals(SEND_BYE)) {
 					String host = userSocket.getInetAddress().getHostName();
 					int port = userSocket.getPort();
 					
