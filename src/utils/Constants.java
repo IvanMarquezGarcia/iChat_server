@@ -34,5 +34,9 @@ public class Constants {
     // For comunication
     public static final String SEND_BYE =                      "---//_/_#b#y#e#_!/_";
     public static final String SERVER_DISCONNECTION =          "------//_/_#s#b#y#e#s#_!/_";
+    // MySQL
+    public static final String NO_RESULTS_FOUND =              "------/NO#_d/#at-a_";
+    public static final String RESULTS_FOUND =				   "------/FO_UND#_d/#at-a_";
+    public static final String ALREADY_EXISTS = 	           "------/alr__e#xists##";
 
 }

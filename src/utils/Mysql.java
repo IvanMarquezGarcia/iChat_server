@@ -81,5 +81,32 @@ public class Mysql {
 		}
 		return RESPONSE_ERROR;
 	}
+	
+	
+	public static ResultSet searchUserByUsername(Connection c, String username) {
+		String query = "SELECT * FROM user WHERE username=?";
+		try {
+			PreparedStatement ps = c.prepareStatement(query);
+			ps.setString(1, username);
+			return ps.executeQuery();
+		} catch(SQLException sqle) {
+			return null;
+		}
+	}
+	
+	
+	public static String userExistsByUsername(Connection c, String username) {
+		ResultSet rs = searchUserByUsername(c, username);
+		try {
+			if (rs == null)
+				return RESPONSE_ERROR;
+			else if (rs.next())
+				return ALREADY_EXISTS;
+			return NO_RESULTS_FOUND;
+		} catch (SQLException sqle) {
+			sqle.printStackTrace();
+			return RESPONSE_ERROR;
+		}
+	}
 
 }

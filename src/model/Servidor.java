@@ -234,8 +234,11 @@ public class Servidor {
 											String response = RESPONSE_ERROR;
 											if (data.get("type").equals("login"))
 												response = Mysql.login(connection, data);
-											else if (data.get("type").equals("logup"))
-												response = Mysql.logup(connection, data);
+											else if (data.get("type").equals("logup")) {
+												response = Mysql.userExistsByUsername(connection, data.get("username"));
+												if (response.equals(NO_RESULTS_FOUND))
+													response = Mysql.logup(connection, data);
+											}
 											output.writeUTF(response);
 										}
 										else
