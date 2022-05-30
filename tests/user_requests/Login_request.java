@@ -1,4 +1,4 @@
-package client_requests;
+package user_requests;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
