@@ -8,6 +8,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 
+import org.json.JSONObject;
+
 import static utils.Constants.*;
 
 
@@ -46,24 +48,27 @@ public class Mysql {
 	}
 
 
-	public static String login(Connection c, HashMap<String, String> data) {
-		String query = "SELECT username, password FROM user WHERE username = ?";
+	public static HashMap<String, String> login(Connection c, HashMap<String, String> data) {
+		HashMap<String, String> response = new HashMap<String, String>();
+		String query = "SELECT id, username, password, language FROM user WHERE username = ? AND password = ?";
 		try {
 			PreparedStatement ps = c.prepareStatement(query);
 			ps.setString(1, data.get("username"));
+			ps.setString(2, data.get("password"));
 			ResultSet rs = ps.executeQuery();
 			if (rs.next()) {
-				if (rs.getString(2).equals(data.get("password")))
-					return RESPONSE_OK;
-				else
-					return RESPONSE_INCORRECT_PASSWORD;
+				response.put("code", RESPONSE_OK);
+				response.put("id", rs.getString(1));
+				response.put("username", rs.getString(2));
+				response.put("language", rs.getString(4));
 			}
 			else
-				return RESPONSE_UNREGISTERED;
+				response.put("code", RESPONSE_UNREGISTERED);
 		} catch (SQLException e) {
 			e.printStackTrace();
-			return RESPONSE_ERROR;
+			response.put("code", RESPONSE_ERROR);
 		}
+		return response;
 	}
 
 

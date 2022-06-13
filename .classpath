@@ -16,5 +16,6 @@
 	<classpathentry kind="lib" path="C:/Program Files/Java/jFX/openjfx-11.0.2_windows-x64_bin-sdk/javafx-sdk-11.0.2/lib/javafx.web.jar"/>
 	<classpathentry kind="lib" path="C:/Program Files/Java/jFX/openjfx-11.0.2_windows-x64_bin-sdk/javafx-sdk-11.0.2/lib/javafx-swt.jar"/>
 	<classpathentry kind="lib" path="C:/Users/ivanm/DATA/instituto/proyectoFinal/proyectos/ichat/pruebas/iChat/server/server/src/utils/databases/connectors/mysql-connector-java-8.0.27.jar"/>
+	<classpathentry kind="lib" path="C:/Users/ivanm/DATA/instituto/proyectoFinal/proyectos/ichat/pruebas/iChat/server/server/src/utils/json/json-20220320.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

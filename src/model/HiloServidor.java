@@ -22,9 +22,9 @@ package model;
 
 
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.SocketException;
 
@@ -38,17 +38,19 @@ import static utils.Constants.*;
 
 public class HiloServidor implements Runnable {
 
-	private Servidor servidor;
-	private DataInputStream input;
-	private DataOutputStream output;
+	//private DataInputStream input;
+	//private DataOutputStream output;
+	private ObjectInputStream input;
+	private ObjectOutputStream output;
 	private Socket userSocket;
-	private String username;
+	private Servidor servidor;
+	private User user;
 
 	
-	public HiloServidor(String username, Socket s, Servidor servidor) {
-		this.username = username;
+	public HiloServidor(Socket s, Servidor servidor, User user) {
 		this.userSocket = s;
 		this.servidor = servidor;
+		this.user = user;
 	}
 
 	
@@ -56,8 +58,8 @@ public class HiloServidor implements Runnable {
 		return userSocket;
 	}
 	
-	public String getUsername() {
-		return username;
+	public User getUser() {
+		return user;
 	}
 
 	
@@ -73,15 +75,15 @@ public class HiloServidor implements Runnable {
 	public void run() {
 		try {
 			// Iniciar flujos de entrada y salida
-			input = new DataInputStream(userSocket.getInputStream());
-			output = new DataOutputStream(userSocket.getOutputStream());
+			input = new ObjectInputStream(userSocket.getInputStream());
+			output = new ObjectOutputStream(userSocket.getOutputStream());
 			
 			while (servidor.isConectado() == true) {
 				// Reciber mensaje de cliente
-				String mensaje = input.readUTF();
+				Mensaje mensaje = (Mensaje) input.readObject();
 
 				// user is going to disconnect
-				if (mensaje.equals(SEND_BYE)) {
+				if (mensaje.getContenido().equals(SEND_BYE)) {
 					String host = userSocket.getInetAddress().getHostName();
 					int port = userSocket.getPort();
 					
@@ -100,9 +102,9 @@ public class HiloServidor implements Runnable {
 					// Informar al resto de clientes conectados
 					Platform.runLater(() -> {
 						servidor.listView.getItems().add("[" + new Date() + "] | [HOST: " + host + " PORT: " + port + "] - " +
-														username + " se ha desconectado\n");
+														user.getUsername() + "/" + mensaje.getSender() + " se ha desconectado\n");
 						servidor.listView.scrollTo(servidor.listView.getItems().size() - 1);
-						servidor.mensajeParaTodos("\t\t>> " + username + " se ha desconectado <<", this);
+						servidor.mensajeParaTodos(new Mensaje("\t\t>> " + user.getUsername() + "/" + mensaje.getSender() + " se ha desconectado <<", "es", -1), this);
 					});
 					
 					break;
@@ -114,14 +116,20 @@ public class HiloServidor implements Runnable {
 	
 					// Mostrar mensaje en el �rea de texto
 					Platform.runLater(() -> {                    
-						servidor.listView.getItems().add(mensaje + "\n");
+						servidor.listView.getItems().add(mensaje.getSender() + " > " + mensaje.getContenido());
 						servidor.listView.scrollTo(servidor.listView.getItems().size() - 1);
 					});
 				}
 			}
 		}
-		catch(SocketException se) {
+		catch (ClassNotFoundException cnfe) {
+			System.out.println("-----------------------------------------------------------");
+    		//cnfe.printStackTrace();
+       		System.out.println("Error al conseguir clase <Mensaje>");
     		System.out.println("-----------------------------------------------------------");
+		}
+		catch(SocketException se) {
+			System.out.println("-----------------------------------------------------------");
     		//se.printStackTrace();
     		System.out.println("La escucha del servidor se ha interrumpido.");
     		System.out.println("-----------------------------------------------------------");
@@ -157,10 +165,10 @@ public class HiloServidor implements Runnable {
 		PAR�METROS:
 		 + String que representa el mensaje a enviar
 	*/
-	public void mensajeExclusivo(String message) {
+	public void mensajeExclusivo(Mensaje message) {
 		try {
-			DataOutputStream output = new DataOutputStream(userSocket.getOutputStream());
-			output.writeUTF(message);
+			//ObjectOutputStream output = new ObjectOutputStream(userSocket.getOutputStream());
+			output.writeObject(message);
 			output.flush();
 
 		} catch (IOException ex) {

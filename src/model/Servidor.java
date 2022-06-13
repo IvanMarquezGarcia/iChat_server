@@ -38,7 +38,9 @@ import java.util.HashMap;
 import javafx.application.Platform;
 
 import javafx.scene.control.ListView;
+
 import utils.Mysql;
+import utils.Core;
 
 import static utils.Constants.*;
 
@@ -93,17 +95,17 @@ public class Servidor {
 			+ HiloServidor que representa el hilo del
 				servidor que env�a el mensaje.
 	*/
-	public void mensajeParaTodos(String mensaje, HiloServidor hlsEmisor) {
+	public void mensajeParaTodos(Mensaje message, HiloServidor hlsEmisor) {
 		if (hlsEmisor == null) { // enviar a todos
 			for (HiloServidor hls : this.listaConexiones) {
 				if (hls.getUserSocket() != null)
-					hls.mensajeExclusivo(mensaje);
+					hls.mensajeExclusivo(message);
 			}
 		}
 		else { // enviar a todos excepto al que sea igual que hlsEmisor
 			for (HiloServidor hls : this.listaConexiones) {
 				if (hls.getUserSocket() != null && hls.equals(hlsEmisor) == false)
-					hls.mensajeExclusivo(mensaje);
+					hls.mensajeExclusivo(message);
 			}
 		}
 	}
@@ -121,7 +123,7 @@ public class Servidor {
 			conectado = false;
 			
 			// Indicar a todos los clientes la desconexi�n del servidor
-			mensajeParaTodos(SERVER_DISCONNECTION, null);
+			mensajeParaTodos(new Mensaje(SERVER_DISCONNECTION, "es", -1), null);
 
 			try {
 				// Cerrar ServerSocket
@@ -158,7 +160,7 @@ public class Servidor {
 
 		for (int i = 0; i < listaConexiones.size(); i++) {
 			if (listaConexiones.get(i).getUserSocket().isClosed()) {
-				System.out.println("\t-" + listaConexiones.get(i).getUsername() + " eliminado");
+				System.out.println("\t-" + listaConexiones.get(i) + " eliminado");
 				listaConexiones.remove(i);
 			}
 		}
@@ -166,7 +168,7 @@ public class Servidor {
 		if (listaConexiones.size() > 0) {
 			System.out.println("\n");
 			for (int i = 0; i < listaConexiones.size(); i++) {
-				System.out.println("\t-" + listaConexiones.get(i).getUsername() + " conectado");
+				System.out.println("\t-" + listaConexiones.get(i).getUser().getUsername() + " conectado");
 			}
 		}
 
@@ -219,30 +221,25 @@ public class Servidor {
 										
 										String strData = input.readUTF();
 									    
-									    String[] aux = strData.split(", ");
-									    HashMap<String, String> data = new HashMap<String, String>();
-									    
-									    for (String s : aux) {
-									    	String[] pair = s.split("=");
-									    	System.out.println(s);
-									    	data.put(pair[0], pair[1]);
-									    }
+										HashMap<String, String> data = Core.strToHashMap(strData);
 									    
 										Connection connection = Mysql.connect("127.0.0.1", "root", "root");
+										HashMap<String, String> response = new HashMap<String, String>();
 										
 										if (connection != null) {
-											String response = RESPONSE_ERROR;
 											if (data.get("type").equals("login"))
 												response = Mysql.login(connection, data);
-											else if (data.get("type").equals("logup")) {
+											/*else if (data.get("type").equals("logup")) {
 												response = Mysql.userExistsByUsername(connection, data.get("username"));
 												if (response.equals(NO_RESULTS_FOUND))
 													response = Mysql.logup(connection, data);
-											}
-											output.writeUTF(response);
+											}*/
+											output.writeUTF(response.toString());
 										}
-										else
-											output.writeUTF(RESPONSE_DB_UNABLE_CONNECTION);
+										else {
+											response.put("code", RESPONSE_DB_UNABLE_CONNECTION);
+											output.writeUTF(response.toString());
+										}
 										
 										if (data.get("type").equals("logup"))
 											socket.close();
@@ -250,20 +247,25 @@ public class Servidor {
 										// Si el socket del nuevo cliente es válido
 										if (socket != null && socket.isClosed() == false) {											
 											// Add new connection to connections list
-											HiloServidor hls = new HiloServidor(data.get("username"), socket, this);
+											HiloServidor hls = new HiloServidor(socket, this,
+													new User(Integer.parseInt(response.get("id")), response.get("username"), response.get("language")));
 											listaConexiones.add(hls);
 											
 											// Informar al resto de clientes conectados
 											Platform.runLater(() -> {
-												mensajeParaTodos("\t\t>> " + hls.getUsername() + " se ha conectado <<", hls);
+												Mensaje m = new Mensaje("\t\t>> " + hls.getUser().getUsername() + " se ha conectado <<", "es", -1);
+												mensajeParaTodos(m, hls);
 												listView.getItems().add("[" + new Date() + "] | [HOST: " + hls.getUserSocket().getInetAddress().getHostAddress() +
-																	" PORT: " + hls.getUserSocket().getPort() + "] - " + hls.getUsername() + " se ha conectado\n");
+																	" PORT: " + hls.getUserSocket().getPort() + "] - " + hls.getUser().getUsername() + " se ha conectado\n");
 											});
 											
 											// Crear y ejecutar un nuevo hilo para la comunicaci�n con el cliente
 											Thread thread = new Thread(hls);
 											thread.start();
 										}
+									}
+									catch(NumberFormatException nfe) {
+										nfe.printStackTrace();
 									}
 									catch(IOException ioe) {
 										ioe.printStackTrace();
