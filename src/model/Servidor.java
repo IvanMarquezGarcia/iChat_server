@@ -104,8 +104,10 @@ public class Servidor {
 		}
 		else { // enviar a todos excepto al que sea igual que hlsEmisor
 			for (HiloServidor hls : this.listaConexiones) {
-				if (hls.getUserSocket() != null && hls.equals(hlsEmisor) == false)
+				if (hls.getUserSocket() != null && hls.equals(hlsEmisor) == false) {
 					hls.mensajeExclusivo(message);
+					System.out.println("sent to " + hls.getUser().getUsername());
+				}
 			}
 		}
 	}
@@ -229,11 +231,11 @@ public class Servidor {
 										if (connection != null) {
 											if (data.get("type").equals("login"))
 												response = Mysql.login(connection, data);
-											/*else if (data.get("type").equals("logup")) {
-												response = Mysql.userExistsByUsername(connection, data.get("username"));
-												if (response.equals(NO_RESULTS_FOUND))
-													response = Mysql.logup(connection, data);
-											}*/
+											else if (data.get("type").equals("logup")) {
+												response.put("code", Mysql.userExistsByUsername(connection, data.get("username")));
+												if (response.get("code").equals(NO_RESULTS_FOUND))
+													response.replace("code", Mysql.logup(connection, data));
+											}
 											output.writeUTF(response.toString());
 										}
 										else {
@@ -241,7 +243,7 @@ public class Servidor {
 											output.writeUTF(response.toString());
 										}
 										
-										if (data.get("type").equals("logup"))
+										if (data.get("type").equals("logup") || !response.get("code").equals(RESPONSE_OK))
 											socket.close();
 										
 										// Si el socket del nuevo cliente es válido

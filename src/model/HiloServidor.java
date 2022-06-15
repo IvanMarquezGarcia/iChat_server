@@ -22,8 +22,8 @@ package model;
 
 
 
+import java.io.EOFException;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.SocketException;
@@ -40,7 +40,7 @@ public class HiloServidor implements Runnable {
 
 	//private DataInputStream input;
 	//private DataOutputStream output;
-	private ObjectInputStream input;
+	private MessageObjectInputStream input;
 	private ObjectOutputStream output;
 	private Socket userSocket;
 	private Servidor servidor;
@@ -75,7 +75,7 @@ public class HiloServidor implements Runnable {
 	public void run() {
 		try {
 			// Iniciar flujos de entrada y salida
-			input = new ObjectInputStream(userSocket.getInputStream());
+			input = new MessageObjectInputStream(userSocket.getInputStream());
 			output = new ObjectOutputStream(userSocket.getOutputStream());
 			
 			while (servidor.isConectado() == true) {
@@ -84,9 +84,6 @@ public class HiloServidor implements Runnable {
 
 				// user is going to disconnect
 				if (mensaje.getContenido().equals(SEND_BYE)) {
-					String host = userSocket.getInetAddress().getHostName();
-					int port = userSocket.getPort();
-					
 					userSocket.shutdownInput();
 					userSocket.shutdownOutput();
 					userSocket.close();
@@ -96,16 +93,6 @@ public class HiloServidor implements Runnable {
 					
 					output.close();
 					output = null;
-					
-					servidor.limpiarConexiones();
-					
-					// Informar al resto de clientes conectados
-					Platform.runLater(() -> {
-						servidor.listView.getItems().add("[" + new Date() + "] | [HOST: " + host + " PORT: " + port + "] - " +
-														user.getUsername() + "/" + mensaje.getSender() + " se ha desconectado\n");
-						servidor.listView.scrollTo(servidor.listView.getItems().size() - 1);
-						servidor.mensajeParaTodos(new Mensaje("\t\t>> " + user.getUsername() + "/" + mensaje.getSender() + " se ha desconectado <<", "es", -1), this);
-					});
 					
 					break;
 				}
@@ -124,30 +111,52 @@ public class HiloServidor implements Runnable {
 		}
 		catch (ClassNotFoundException cnfe) {
 			System.out.println("-----------------------------------------------------------");
-    		//cnfe.printStackTrace();
+    		cnfe.printStackTrace();
        		System.out.println("Error al conseguir clase <Mensaje>");
     		System.out.println("-----------------------------------------------------------");
+    		try { userSocket.close(); } catch (IOException e) { e.printStackTrace(); }
 		}
 		catch(SocketException se) {
 			System.out.println("-----------------------------------------------------------");
-    		//se.printStackTrace();
+    		se.printStackTrace();
     		System.out.println("La escucha del servidor se ha interrumpido.");
     		System.out.println("-----------------------------------------------------------");
+    		try { userSocket.close(); } catch (IOException e) { e.printStackTrace(); }
     	}
+		catch (EOFException eofe) {
+			System.out.println("-----------------------------------------------------------");
+			eofe.printStackTrace();
+			System.out.println("Fin de flujo inesperado.");
+			System.out.println("-----------------------------------------------------------");
+			try { userSocket.close(); } catch (IOException e) { e.printStackTrace(); }
+		}
 		catch (IOException ioe) {
 			System.out.println("-----------------------------------------------------------");
-			//ioe.printStackTrace();
+			ioe.printStackTrace();
 			System.out.println("Error de e/s");
 			System.out.println("-----------------------------------------------------------");
+			try { userSocket.close(); } catch (IOException e) { e.printStackTrace(); }
 		}
 		finally {
 			try {
 				if (userSocket.isClosed() == false)
 					userSocket.close();
+				
+				servidor.limpiarConexiones();
+				
+				// Informar al resto de clientes conectados
+				String host = userSocket.getInetAddress().getHostName();
+				int port = userSocket.getPort();
+				Platform.runLater(() -> {
+					servidor.listView.getItems().add("[" + new Date() + "] | [HOST: " + host + " PORT: " + port + "] - " +
+													user.getUsername() + "/" + user.getUsername() + " se ha desconectado\n");
+					servidor.listView.scrollTo(servidor.listView.getItems().size() - 1);
+					servidor.mensajeParaTodos(new Mensaje("\t\t>> " + user.getUsername() + "/" + user.getUsername() + " se ha desconectado <<", "es", -1), this);
+				});
 			}
 			catch (IOException ex) {
 				System.out.println("-----------------------------------------------------------");
-				//ex.printStackTrace();
+				ex.printStackTrace();
 				System.out.println("Error al cerrar el socket del cliente");
 				System.out.println("-----------------------------------------------------------");
 			}

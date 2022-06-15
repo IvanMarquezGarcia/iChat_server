@@ -8,8 +8,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 
-import org.json.JSONObject;
-
 import static utils.Constants.*;
 
 
@@ -50,17 +48,20 @@ public class Mysql {
 
 	public static HashMap<String, String> login(Connection c, HashMap<String, String> data) {
 		HashMap<String, String> response = new HashMap<String, String>();
-		String query = "SELECT id, username, password, language FROM user WHERE username = ? AND password = ?";
+		String query = "SELECT id, username, password, language FROM user WHERE username = ?";
 		try {
 			PreparedStatement ps = c.prepareStatement(query);
 			ps.setString(1, data.get("username"));
-			ps.setString(2, data.get("password"));
 			ResultSet rs = ps.executeQuery();
 			if (rs.next()) {
-				response.put("code", RESPONSE_OK);
-				response.put("id", rs.getString(1));
-				response.put("username", rs.getString(2));
-				response.put("language", rs.getString(4));
+				if (!rs.getString(3).equals(data.get("password")))
+					response.put("code", RESPONSE_INCORRECT_PASSWORD);
+				else {
+					response.put("code", RESPONSE_OK);
+					response.put("id", rs.getString(1));
+					response.put("username", rs.getString(2));
+					response.put("language", rs.getString(4));
+				}
 			}
 			else
 				response.put("code", RESPONSE_UNREGISTERED);
@@ -81,7 +82,8 @@ public class Mysql {
 			ps.setString(3, data.get("language"));
 			if (ps.executeUpdate() >= 0)
 				return RESPONSE_OK;
-		} catch (SQLException e) {
+		}
+		catch (SQLException e) {
 			e.printStackTrace();
 		}
 		return RESPONSE_ERROR;
