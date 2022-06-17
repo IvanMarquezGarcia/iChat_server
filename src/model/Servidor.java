@@ -1,16 +1,17 @@
 /*
 	Hecho por: Iván Márquez García
-
+		
 	2° D.A.M.
+	
+	Proyecto final - iChat
 
 
+	------------------------------- DESCRIPCIÓN -------------------------------
 
-	------------------------------- DESCRIPCI�N -------------------------------
-
-	Esta es la clase que act�a como servidor. Tiene una lista donde almacena
+	Esta es la clase que actúa como servidor. Tiene una lista donde almacena
 	todas las conexiones funcionales con los clientes conectados.
 	
-	Su funci�n es aceptar peticiones continuamente en funci�n del m�ximo permitido.
+	Su función es aceptar peticiones continuamente en función del máximo permitido.
 	
 	Cuando un cliente se conecta, crea un hilo usando una instancia de
 	HiloServidor y lo ejecuta para que este se encargue de las tareas vinculadas

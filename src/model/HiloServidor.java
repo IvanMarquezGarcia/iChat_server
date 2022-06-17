@@ -1,18 +1,14 @@
 /*
-	Hecho por:
-		Eloy Guillermo Villad�niga M�rquez
-		e
-		Iv�n M�rquez Garc�a
-
-	2� D.A.M.
-
-	Pr�ctica "Chat Colectivo" - Programaci�n de Servicios y Procesos
+	Hecho por: Iván Márquez García
+		
+	2° D.A.M.
+	
+	Proyecto final - iChat
 
 
+	------------------------------- DESCRIPCIÓN -------------------------------
 
-	------------------------------- DESCRIPCI�N -------------------------------
-
-	Representa un hilo que se encarga de las tareas de una conexi�n entre el
+	Representa un hilo que se encarga de las tareas de una conexión entre el
 	servidor y un cliente.
  */
 

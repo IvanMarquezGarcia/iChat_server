@@ -1,16 +1,12 @@
 /*
-	Hecho por:
-		Eloy Guillermo Villadóniga Márquez
-		e
-		Iván Márquez García
-
-	2° D.A.M.
-
-	Práctica "Chat Colectivo" - Programación de Servicios y Procesos
+	Hecho por: IvÃ¡n MÃ¡rquez GarcÃ­a
+		
+	2Â° D.A.M.
+	
+	Proyecto final - iChat
 
 
-
-	------------------------------- DESCRIPCIÓN -------------------------------
+	------------------------------- DESCRIPCIÃ“N -------------------------------
 
 	Controlador de la vista VistaServidor.fxml.
 */
@@ -112,8 +108,8 @@ public class ControladorServidor {
 	/*
 		ESTADO: FUNCIONAL 
 		
-		DESCRIPCIÓN:
-			Cerrar aplicación.
+		DESCRIPCIï¿½N:
+			Cerrar aplicaciï¿½n.
 	*/
 	@FXML
     void cerrar(MouseEvent event) {
@@ -125,7 +121,7 @@ public class ControladorServidor {
 	/*
 		ESTADO: FUNCIONAL 
 		
-		DESCRIPCIÓN:
+		DESCRIPCIï¿½N:
 			Descnectar servidor.
 	*/
 	@FXML
@@ -137,7 +133,7 @@ public class ControladorServidor {
 	/*
 		ESTADO: FUNCIONAL 
 		
-		DESCRIPCIÓN:
+		DESCRIPCIï¿½N:
 			Arrancar servidor.
 	*/
 	@FXML

@@ -1,15 +1,14 @@
 /*
-	Hecho por: Iván Márquez García
+	Hecho por: IvÃ¡n MÃ¡rquez GarcÃ­a
 		
-	2° D.A.M.
+	2Â° D.A.M.
 	
-	Práctica "Chat Colectivo" - Programación de Servicios y Procesos
+	Proyecto final - iChat
 	
 	
+	------------------------------- DESCRIPCIÃ“N -------------------------------
 	
-	------------------------------- DESCRIPCIÓN -------------------------------
-	
-	Este es el archivo para ejecutar la apliciación gráfica asociada a un
+	Este es el archivo para ejecutar la apliciaciÃ³n grÃ¡fica asociada a un
 	servidor.
 */
 
@@ -50,7 +49,7 @@ public class AplicacionServidor extends Application {
 		try {
 			Scene scene = new Scene(fxmlLoader.load(), 375, 280);
 			
-			stage.setTitle("Configuración de Servidor de eiChat");
+			stage.setTitle("Configuraciï¿½n de Servidor de eiChat");
 			stage.setScene(scene);
 			stage.setResizable(false);
 			stage.initStyle(StageStyle.UNDECORATED);
@@ -63,7 +62,7 @@ public class AplicacionServidor extends Application {
 		}
     }
 
-    // Método para lanzar la aplicación gráfica
+    // Mï¿½todo para lanzar la aplicaciï¿½n grï¿½fica
     public static void main(String[] args) {
         launch(args);
     }

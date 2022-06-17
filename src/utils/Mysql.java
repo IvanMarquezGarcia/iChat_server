@@ -1,3 +1,16 @@
+/*
+	Hecho por: Iván Márquez García
+		
+	2° D.A.M.
+	
+	Proyecto final - iChat
+
+
+	------------------------------- DESCRIPCIÓN -------------------------------
+	
+	Clases para el acceso a la base de datos.
+*/
+
 package utils;
 
 

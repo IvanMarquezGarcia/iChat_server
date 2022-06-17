@@ -1,16 +1,12 @@
 /*
-	Hecho por:
-		Eloy Guillermo Villadóniga Márquez
-		e
-		Iván Márquez García
-
-	2° D.A.M.
-
-	Práctica "Chat Colectivo" - Programación de Servicios y Procesos
+	Hecho por: IvÃ¡n MÃ¡rquez GarcÃ­a
+		
+	2Â° D.A.M.
+	
+	Proyecto final - iChat
 
 
-
-	------------------------------- DESCRIPCIÓN -------------------------------
+	------------------------------- DESCRIPCIÃ“N -------------------------------
 
 	Controlador de la vista VistaServidorConfig.fxml.
 */
@@ -101,8 +97,8 @@ public class ControladorServidorConfig {
 	/*
 		ESTADO: FUNCIONAL 
 		
-		DESCRIPCIÓN:
-			Cerrar aplicación.
+		DESCRIPCIï¿½N:
+			Cerrar aplicaciï¿½n.
 	*/
     @FXML
     void cerrar(MouseEvent event) {
@@ -113,9 +109,9 @@ public class ControladorServidorConfig {
 	/*
 		ESTADO: FUNCIONAL 
 		
-		DESCRIPCIÓN:
+		DESCRIPCIï¿½N:
 			Abrir una ventana asociada a un servidor
-			con las características indicadas en la
+			con las caracterï¿½sticas indicadas en la
 			vista asociada a este controlador.
 	*/
     @FXML
@@ -138,7 +134,7 @@ public class ControladorServidorConfig {
     	    	    		s = new Servidor(puerto, max);
         	    		}
         	    		catch (NumberFormatException nfe){
-        	    			error_text.setText("Límite inválido");
+        	    			error_text.setText("Lï¿½mite invï¿½lido");
         	    		}
         	    	}
         	    	else {
@@ -178,15 +174,15 @@ public class ControladorServidorConfig {
     		catch(NumberFormatException nfe) {
     			System.out.println("---------------------------------------------------------------------");
 				// nfe.printStackTrace();
-				System.out.println("Puerto no válido");
+				System.out.println("Puerto no vï¿½lido");
 				System.out.println("---------------------------------------------------------------------");
     			
-    			error_text.setText("Puerto no válido");
+    			error_text.setText("Puerto no vï¿½lido");
         		error_text.setVisible(true);
     		}
     	}
     	else {
-    		error_text.setText("Puerto no válido");
+    		error_text.setText("Puerto no vï¿½lido");
     		error_text.setVisible(true);
     	}
     }

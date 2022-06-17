@@ -1,6 +1,23 @@
+/*
+	Hecho por: Iván Márquez García
+		
+	2° D.A.M.
+	
+	Proyecto final - iChat
+
+
+	------------------------------- DESCRIPCIÓN -------------------------------
+	
+	Clase con funciones básicas del proyecto.
+*/
+
 package utils;
 
+
+
 import java.util.HashMap;
+
+
 
 public class Core {
 

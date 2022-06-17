@@ -1,4 +1,19 @@
+/*
+	Hecho por: Iván Márquez García
+		
+	2° D.A.M.
+	
+	Proyecto final - iChat
+
+
+	------------------------------- DESCRIPCIÓN -------------------------------
+	
+	Clase que concentra los constantes del proyecto.
+*/
+
 package utils;
+
+
 
 public class Constants {
 

@@ -1,16 +1,12 @@
 /*
-	Hecho por:
-		Eloy Guillermo Villadóniga Márquez
-		e
-		Iván Márquez García
-
-	2° D.A.M.
-
-	Práctica "Chat Colectivo" - Programación de Servicios y Procesos
+	Hecho por: IvÃ¡n MÃ¡rquez GarcÃ­a
+		
+	2Â° D.A.M.
+	
+	Proyecto final - iChat
 
 
-
-	------------------------------- DESCRIPCIÓN -------------------------------
+	------------------------------- DESCRIPCIÃ“N -------------------------------
 	
 	Representa a un mensaje del chat.
  */
